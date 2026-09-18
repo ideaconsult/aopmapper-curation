@@ -19,6 +19,8 @@ tasks:
     product:
       nb:   "{{manuscript_repo}}/manuscript/generated/kec116_export.ipynb"
       json: "{{manuscript_repo}}/manuscript/generated/kec116_stats.json"
+      # Supplementary Table S1 (the whole pilot panel); a .tsv of it is written alongside
+      panel: "{{manuscript_repo}}/manuscript/supplementary/table_s1_model_panel.md"
     params:
       crossmodel_dir: "{{kec116_crossmodel_dir}}"
       manuscript_repo: "{{manuscript_repo}}"
@@ -26,6 +28,9 @@ tasks:
       smaa_variants: "{{kec116_smaa_variants}}"
       figures: "{{kec116_figures}}"
       n_top_models: 8
+      # same-checkpoint pairs (base vs quantization / fine-tune) whose triple-set Jaccard
+      # is reported against the whole panel's pairwise distribution
+      lineage_pairs: "{{kec116_lineage_pairs}}"
 
   - source: tasks/export_manuscript_results.py
     name: export_kec_all

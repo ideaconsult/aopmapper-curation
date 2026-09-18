@@ -29,6 +29,7 @@ from __future__ import annotations
 import csv
 import json
 import shutil
+import statistics
 from pathlib import Path
 
 from tasks.logutil import setup_logging
@@ -55,6 +56,9 @@ reference_check_json = None    # optional: aop451_reference_check.py's json — 
                                 # the published manual curation (the one outside reference)
 viz_assay_consensus_json = None  # optional: assay consensus clusters, for the panel-level
                                   # top-support assays per worked-example KE
+lineage_pairs = []             # optional: [{"a": model, "b": model, "relation": str}] -
+                                # same-checkpoint pairs whose triple-set Jaccard is reported
+                                # against the panel-wide pairwise distribution
 # -
 
 logger = setup_logging(Path(product["json"]).parent / "export_manuscript_results.log")
@@ -135,6 +139,102 @@ def _panel_quality(crossmodel: Path, variant: str, column: str) -> dict:
     if hi <= lo:
         return {m: 1.0 for m in raw}
     return {m: (v - lo) / (hi - lo) for m, v in raw.items()}
+
+
+#: crossmodel_compare scores the curated layer as a pseudo-model under this key; it is not a
+#: panel member, so its pairs are left out of the panel-wide distribution.
+GROUND_TRUTH_KEY = "ground_truth"
+
+
+def _lineage_jaccard(crossmodel: Path) -> dict | None:
+    """Triple-set Jaccard for each configured same-checkpoint pair (`lineage_pairs`),
+    set against the distribution over all panel pairs, from crossmodel_pairwise.tsv."""
+    p = crossmodel / "crossmodel_pairwise.tsv"
+    if not lineage_pairs or not p.exists():
+        return None
+    by_pair, values = {}, []
+    with open(p, encoding="utf-8") as f:
+        for row in csv.DictReader(f, delimiter="\t"):
+            a, b = row["model_a"], row["model_b"]
+            if GROUND_TRUTH_KEY in (a, b):
+                continue
+            rec = {"jaccard": float(row["jaccard"]), "shared": int(row["shared"]),
+                   "union": int(row["union"])}
+            by_pair[frozenset((a, b))] = rec
+            values.append(rec["jaccard"])
+    pairs = []
+    for spec in lineage_pairs:
+        rec = by_pair.get(frozenset((spec["a"], spec["b"])))
+        if rec is None:
+            logger.warning(f"lineage pair not in {p.name}: {spec['a']} / {spec['b']}")
+            continue
+        pairs.append({**spec, **rec})
+    pairs.sort(key=lambda r: -r["jaccard"])
+    values.sort()
+    return {
+        "pairs": pairs,
+        "distribution": {
+            "n_pairs": len(values),
+            "median": round(statistics.median(values), 4),
+            "p90": round(statistics.quantiles(values, n=10, method="inclusive")[-1], 4),
+            "max": round(values[-1], 4),
+        },
+    }
+
+
+#: smaa_criteria.tsv columns -> supplementary panel table headers, in table order.
+PANEL_COLUMNS = [
+    ("match_rate", "Curated agreement"), ("gt_coverage", "Curated recall"),
+    ("method_iri_frac", "Exact-IRI grounding"), ("action_margin_auc", "Action margin"),
+    ("consensus_agreement", "Panel agreement"), ("first_rank_prob", "P(rank 1)"),
+    ("expected_rank", "Expected rank"), ("topsis_score", "TOPSIS"),
+]
+
+
+def _hf_id(model_key: str) -> str:
+    """Model keys are Hugging Face ids with "/" written as "--" (org--name)."""
+    return model_key.replace("--", "/", 1)
+
+
+def _write_panel_table(crossmodel: Path, variant: str, selected: list[str],
+                       md_path: Path) -> int:
+    """Supplementary table of the whole panel: every model SMAA ranked, its criteria, and
+    whether the adopted ensemble selected it. Writes Markdown (for the build) and a TSV of
+    the same rows beside it. Returns the number of models written."""
+    p = crossmodel / variant / "smaa_criteria.tsv"
+    if not p.exists():
+        logger.warning(f"panel table skipped, {p} not found")
+        return 0
+    with open(p, encoding="utf-8") as f:
+        rows = list(csv.DictReader(f, delimiter="\t"))
+    rows.sort(key=lambda r: float(r["expected_rank"]))
+    chosen = set(selected)
+    header = ["#", "Model"] + [h for _, h in PANEL_COLUMNS] + ["Selected"]
+    table = []
+    for i, r in enumerate(rows, 1):
+        vals = []
+        for col, _ in PANEL_COLUMNS:
+            v = r.get(col, "")
+            vals.append(f"{float(v):.2f}" if col == "expected_rank" and v
+                        else (f"{float(v):.3f}" if v else ""))
+        table.append([str(i), _hf_id(r["model"])] + vals
+                     + ["yes" if r["model"] in chosen else ""])
+
+    md_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "| " + " | ".join(header) + " |",
+        "|" + "|".join(["---:", "---"] + ["---:"] * len(PANEL_COLUMNS) + [":---:"]) + "|",
+    ] + ["| " + " | ".join(row) + " |" for row in table]
+    caption = (f"Table: Supplementary Table S1. The {len(rows)}-model pilot panel, ordered by "
+               "SMAA expected rank under the five-criterion ranking. Model is the Hugging Face "
+               "identifier. Criteria are as defined in Methods; Selected marks the "
+               f"{len(chosen)} models of the adopted ensemble.")
+    md_path.write_text("\n".join(lines) + "\n\n" + caption + "\n", encoding="utf-8")
+    with open(md_path.with_suffix(".tsv"), "w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f, delimiter="\t")
+        w.writerow(header)
+        w.writerows(table)
+    return len(rows)
 
 
 def _mean_quality(models: list[str], quality: dict) -> float | None:
@@ -701,6 +801,19 @@ if enabled:
                 }
             if variant_ensembles:
                 ensemble[variant] = variant_ensembles
+
+        # supplementary panel table: only for a section whose product declares "panel"
+        if "panel" in product:
+            adopted = (ensemble.get("default", {}).get("pareto_smaa") or {}).get(
+                "recommended_models", [])
+            n = _write_panel_table(crossmodel, "default", adopted, Path(product["panel"]))
+            logger.info(f"panel table: {n} models -> {product['panel']}")
+
+        lineage = _lineage_jaccard(crossmodel)
+        if lineage:
+            out["lineage_jaccard"] = lineage
+            logger.info(f"lineage Jaccard: {len(lineage['pairs'])} pairs vs "
+                        f"{lineage['distribution']['n_pairs']} panel pairs")
 
         out["source"] = str(crossmodel)
         out["crossmodel_overview"] = overview
