@@ -1,0 +1,197 @@
+{
+  "aop_wiki_id": 451,
+  "title": "Interaction with lung resident cell membrane components leads to lung cancer",
+  "reference": {
+    "citation_key": "nymark2021",
+    "citation": "Nymark, Karlsson, Halappanavar & Vogel (2021), Adverse Outcome Pathway Development for Assessment of Lung Carcinogenicity by Nanoparticles, Frontiers in Toxicology 3:653386",
+    "doi": "10.3389/ftox.2021.653386",
+    "figure": "Figure 1"
+  },
+  "_comment": "KE groupings and assay names transcribed from Figure 1A/1B of the reference above. KE ids are AOP-Wiki wiki_ids (KE####), mapped from the KE labels used in Figure 1A. guideline is the OECD Test Guideline number where the figure names one; null where the figure names only an assay/method type.",
+  "key_events": [
+    {
+      "group": "MIE",
+      "figure_label": "MIE1495",
+      "ke_ids": ["KE1495"],
+      "title": "Interaction with the lung resident cell membrane components"
+    },
+    {
+      "group": "KE1A",
+      "figure_label": "KE1A",
+      "ke_ids": ["KE1492", "KE1496", "KE1497"],
+      "title": "Inflammation"
+    },
+    {
+      "group": "KE1B",
+      "figure_label": "KE1B",
+      "ke_ids": ["KE2006"],
+      "title": "Secondary genotoxicity",
+      "note": "AOP-Wiki marks KE2006 'under development' as of the 2026-07-01 release: title present, description empty. Not usable as an extraction target until AOP-Wiki curation adds text; report as a coverage gap, not a model failure."
+    },
+    {
+      "group": "KE1C",
+      "figure_label": "KE1C",
+      "ke_ids": ["KE1115", "KE1538", "KE1088"],
+      "title": "Oxidative stress"
+    },
+    {
+      "group": "KE2",
+      "figure_label": "KE2",
+      "ke_ids": ["KE1634", "KE185", "KE1869"],
+      "title": "Increase, oxidative damage to DNA"
+    },
+    {
+      "group": "KE3",
+      "figure_label": "KE3",
+      "ke_ids": ["KE185", "KE1869"],
+      "title": "Induction of mutations in critical genes"
+    },
+    {
+      "group": "KE4",
+      "figure_label": "KE4",
+      "ke_ids": ["KE870", "KE429"],
+      "title": "Increase, Cell proliferation"
+    },
+    {
+      "group": "AO",
+      "figure_label": "AO1670",
+      "ke_ids": ["KE1670"],
+      "title": "Lung cancer"
+    }
+  ],
+  "standardized_assays": [
+    {
+      "endpoint_group": "deposited dose (in silico)",
+      "assay_name": "Multiple-Path Particle Dosimetry Model (MPPD)",
+      "method_type": "in_silico",
+      "guideline": null,
+      "relevant_ke_groups": ["MIE"]
+    },
+    {
+      "endpoint_group": "deposited dose (in silico)",
+      "assay_name": "In vitro Sedimentation, Diffusion and Dosimetry model (ISDD)",
+      "method_type": "in_silico",
+      "guideline": null,
+      "relevant_ke_groups": ["MIE"]
+    },
+    {
+      "endpoint_group": "deposited dose (in vitro)",
+      "assay_name": "Direct measurement (ICP-MS, AAS)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["MIE"]
+    },
+    {
+      "endpoint_group": "deposited dose (in vitro)",
+      "assay_name": "Cellular imaging (TEM)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["MIE"]
+    },
+    {
+      "endpoint_group": "ROS",
+      "assay_name": "DCFH-DA (cellular)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1C"]
+    },
+    {
+      "endpoint_group": "ROS / antioxidant balance",
+      "assay_name": "Depletion of antioxidant system (e.g. decrease in GSH)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1C"]
+    },
+    {
+      "endpoint_group": "inflammation / inflammatory effects",
+      "assay_name": "Perturbed pro-inflammatory mediators (qRT-PCR, ELISA, IHT immuno-histochemistry, transcriptomics)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1A"]
+    },
+    {
+      "endpoint_group": "inflammation / inflammatory effects",
+      "assay_name": "Reporter cell assays (ToxTracker)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1A"]
+    },
+    {
+      "endpoint_group": "inflammation / inflammatory effects",
+      "assay_name": "Conditioned media-based techniques",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1A"]
+    },
+    {
+      "endpoint_group": "inflammation / inflammatory effects",
+      "assay_name": "Co-culture techniques",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1A"]
+    },
+    {
+      "endpoint_group": "genotoxicity (primary/secondary), DNA damage",
+      "assay_name": "Comet assay (standard or FPG-modified)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1B", "KE2"]
+    },
+    {
+      "endpoint_group": "genotoxicity (primary/secondary), DNA damage",
+      "assay_name": "8-OHG and gammaH2AX / RAD51 immunohistochemistry or flow cytometry (HT, high-throughput)",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE1B", "KE2"]
+    },
+    {
+      "endpoint_group": "chromosome damage and mutation",
+      "assay_name": "Micronucleus assay (OECD TG487, with modifications for nanomaterials)",
+      "method_type": "in_vitro",
+      "guideline": "OECD TG487",
+      "relevant_ke_groups": ["KE3"]
+    },
+    {
+      "endpoint_group": "chromosome damage and mutation",
+      "assay_name": "Chromosomal aberration assay (OECD TG478)",
+      "method_type": "in_vitro",
+      "guideline": "OECD TG478",
+      "relevant_ke_groups": ["KE3"]
+    },
+    {
+      "endpoint_group": "chromosome damage and mutation",
+      "assay_name": "HPRT assay (OECD TG476)",
+      "method_type": "in_vitro",
+      "guideline": "OECD TG476",
+      "relevant_ke_groups": ["KE3"]
+    },
+    {
+      "endpoint_group": "chromosome damage and mutation",
+      "assay_name": "TK assay (OECD TG490)",
+      "method_type": "in_vitro",
+      "guideline": "OECD TG490",
+      "relevant_ke_groups": ["KE3"]
+    },
+    {
+      "endpoint_group": "chromosome damage and mutation",
+      "assay_name": "FE1-MML assay",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE3"]
+    },
+    {
+      "endpoint_group": "cell proliferation / transformation",
+      "assay_name": "Soft Agar Cell Transformation assay",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE4"]
+    },
+    {
+      "endpoint_group": "cell proliferation / transformation",
+      "assay_name": "Colony-Forming Efficiency assay",
+      "method_type": "in_vitro",
+      "guideline": null,
+      "relevant_ke_groups": ["KE4"]
+    }
+  ]
+}

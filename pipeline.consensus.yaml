@@ -1,0 +1,113 @@
+executor: serial
+
+meta:
+    extract_upstream: False
+
+tasks:
+  - source: tasks/crossmodel_compare.py
+    product:
+      nb: "{{products}}/{{crossmodel}}/crossmodel_compare.ipynb"
+      consensus: "{{products}}/{{crossmodel}}/crossmodel_consensus.json"
+      pairwise: "{{products}}/{{crossmodel}}/crossmodel_pairwise.tsv"
+      summary: "{{products}}/{{crossmodel}}/crossmodel_summary.json"
+    params:
+      products: "{{products}}"
+      model_keys: "{{model_keys}}"
+      embedding_model: "{{embedding_model}}"
+      tau: "{{tau}}"
+      min_support: "{{min_support}}"
+      enabled: True
+
+  - source: tasks/viz_consensus.py
+    upstream: ["crossmodel_compare", "select_ensemble"]
+    product:
+      nb: "{{products}}/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/viz_consensus.ipynb"
+      html: "{{products}}/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/viz_consensus.html"
+      data: "{{products}}/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/viz_consensus.json"
+    params:
+      products: "{{products}}"
+      model_keys: "{{model_keys}}"
+      # Show only the recommended ensemble subset (read from the select_ensemble upstream).
+      # Off → all models.
+      restrict_to_ensemble: "{{viz_restrict_to_ensemble}}"
+      min_support: "{{min_support}}"
+      # Solr accept/drop color threshold — same gate tasks/build_kec_enrichment.py applies
+      # (see env.yaml's min_support_ensemble, the pipeline.yaml consumer of this JSON).
+      min_support_ensemble: "{{min_support_ensemble}}"
+
+  - source: tasks/figures_crossmodel.py
+    upstream: ["crossmodel_compare"]
+    product:
+      nb: "{{products}}/{{crossmodel}}/figures_crossmodel.ipynb"
+      dir: "{{products}}/{{crossmodel}}/figures"
+    params:
+      products: "{{products}}"
+      model_keys: "{{model_keys}}"
+
+  - source: tasks/smaa_rank.py
+    upstream: ["crossmodel_compare"]
+    product:
+      nb: "{{products}}/{{crossmodel}}/{{ranking}}/smaa_rank.ipynb"
+      tsv: "{{products}}/{{crossmodel}}/{{ranking}}/smaa_rank.tsv"
+      json: "{{products}}/{{crossmodel}}/{{ranking}}/smaa_summary.json"
+      fig: "{{products}}/{{crossmodel}}/{{ranking}}/figures/fig_smaa_rank.png"
+    params:
+      products: "{{products}}"
+      model_keys: "{{model_keys}}"
+      # Criteria / iri_valid / logprob knobs come from the named block selected by
+      # `ranking:` in env.consensus.yaml (ranking_config). Switch config by name there.
+      ranking_config: "{{ranking_config}}"
+      ranking: "{{ranking}}"
+      audit_as_criterion: False
+      audit_external_as_criterion: False
+      n_iter: 10000
+
+  - source: tasks/select_ensemble.py
+    # crossmodel_compare: per-model kec_match_report.json (read from disk, like smaa_rank);
+    # smaa_rank: its smaa_summary.json is read when smaa_link is tiebreak/prefilter, so it
+    # must be fresh first (harmless ordering edge when smaa_link == none). smaa_rank still
+    # runs its own (unrelated) `ranking`-selected criteria block regardless of ensemble_mode.
+    upstream: ["crossmodel_compare", "smaa_rank"]
+    name: "select_ensemble"
+    product:
+      nb:   "{{products}}/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/select_ensemble.ipynb"
+      tsv:  "{{products}}/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/ensemble_selection.tsv"
+      json: "{{products}}/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/ensemble_summary.json"
+      fig:  "{{products}}/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/figures/fig_ensemble_coverage.png"
+    params:
+      products: "{{products}}"
+      model_keys: "{{model_keys}}"
+      min_gain: "{{ensemble.min_gain}}"
+      budget: "{{ensemble.budget}}"
+      smaa_link: "{{ensemble.smaa_link}}"
+      smaa_topn: "{{ensemble.smaa_topn}}"
+      # smaa_summary.json path is read from the smaa_rank upstream (not passed here).
+      # optional alternative target — cover KEC-endorsed ∪ ontology-grounded novel triples.
+      # Reads crossmodel_compare's `consensus` product + per-model kec_grounded.json (from
+      # disk), only when target == kec_plus_grounded; KEC coverage is always reported.
+      target: "{{ensemble.target}}"
+      grounded_match_levels: "{{ensemble.grounded_match_levels}}"
+      grounded_min_support: "{{ensemble.grounded_min_support}}"
+      # Selection mode — independent of smaa_rank's `ranking` above. "greedy" (default) is
+      # the existing heuristic, unchanged; "ilp" is a genuinely separate exact-coverage mode
+      # (see task docstring) that ignores smaa_link/smaa_topn/min_gain/target entirely;
+      # "pareto_topsis"/"pareto_smaa" put coverage and per-model quality in one objective
+      # and sweep the trade-off — the two names pick different, non-interchangeable quality
+      # scores (deterministic TOPSIS closeness vs. SMAA's own expected rank) and each gets
+      # its own product path so both can be run and compared.
+      ensemble_mode: "{{ensemble_mode}}"
+      # "pareto*" modes only: lambda sweep (the exchange rate between coverage and quality,
+      # swept rather than tuned). quality_column only matters for bare "pareto" (rare —
+      # prefer pareto_topsis/pareto_smaa, which set it themselves).
+      pareto_lambdas: "{{pareto_lambdas}}"
+      quality_column: "{{quality_column}}"
+
+
+  - source: tasks/usage_stats.py
+    product:
+      nb: "{{products}}/{{crossmodel}}/usage_stats.ipynb"
+      csv: "{{products}}/{{crossmodel}}/usage_stats.csv"
+    params:
+      products: "{{products}}"
+      model_keys: "{{model_keys}}"
+      sidecar_name: "kec_logprobs.jsonl"

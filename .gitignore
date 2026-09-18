@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+# pipeline outputs (generated, per env.*.yaml `products:`)
+products/
+*.ipynb_checkpoints/
+
+# local config with real paths, derived from the *.example.yaml templates
+env.manuscript.yaml
+
+# raw AOP-Wiki XML exports (third-party data, not redistributed)
+resources/aopwiki/
+
+.env

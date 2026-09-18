@@ -1,0 +1,63 @@
+# Per-model assay (Methods2AOP) extraction + GT-free per-model trust tasks.
+#
+# Mirrors pipeline.kec.yaml. Run ONCE PER MODEL (swap model_key), reusing the env.kec.yaml
+# models block + model_key:
+#     ploomber build --entry-point pipeline.assays.yaml --env env.kec.yaml
+#
+# Assays have NO ground truth, so this stage produces only GT-free signals: token logprobs
+# (incl. the endpoint_direction margin), evidence-grounding faithfulness, and IRI validity.
+# Cross-model consensus, calibration and SMAA ranking run afterwards via
+# pipeline.assays_consensus.yaml.
+executor: serial
+
+meta:
+    extract_upstream: False
+
+tasks:
+  - source: tasks/get_xsd.py
+    product:
+      nb: "{{products}}/assays/get_xsd.ipynb"
+      xsd: "{{products}}/assays/aop.xsd"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version}}"
+
+  - source: tasks/parse_pydantic.py
+    upstream: ["get_xsd"]
+    product:
+      nb: "{{products}}/assays/parse_pydantic.ipynb"
+      json: "{{products}}/assays/aop.json"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version}}"
+
+  - source: tasks/extract_assays.py
+    upstream: ["parse_pydantic"]
+    product:
+      nb: "{{products}}/assays/{{model_key}}/extract_assays.ipynb"
+      json: "{{products}}/assays/{{model_key}}/assays.json"
+    params:
+      enabled: "{{extract_assays}}"
+      models: "{{models}}"
+      model_key: "{{model_key}}"
+      ke_filter: "{{ke_filter}}"
+
+  - source: tasks/validate_assay_iris.py
+    upstream: ["extract_assays"]
+    product:
+      nb: "{{products}}/assays/{{model_key}}/validate_assay_iris.ipynb"
+      json: "{{products}}/assays/{{model_key}}/validate_assay_iris.json"
+      tsv: "{{products}}/assays/{{model_key}}/validate_assay_iris.tsv"
+    params:
+      model_key: "{{model_key}}"
+
+  - source: tasks/assay_evidence_check.py
+    upstream: ["extract_assays", "parse_pydantic"]
+    product:
+      nb: "{{products}}/assays/{{model_key}}/assay_evidence_check.ipynb"
+      json: "{{products}}/assays/{{model_key}}/assay_evidence_check.json"
+      tsv: "{{products}}/assays/{{model_key}}/assay_evidence_check.tsv"
+      csv: "{{products}}/assays/{{model_key}}/assay_evidence_check_stats.csv"
+    params:
+      model_key: "{{model_key}}"
+

@@ -1,0 +1,128 @@
+executor: serial
+
+meta:
+    extract_upstream: False
+
+tasks:
+  - source: tasks/get_xsd.py
+    product: 
+      nb: "{{products}}/get_xsd.ipynb"
+      xsd: "{{products}}/aop.xsd"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version}}"
+
+  - source: tasks/parse_pydantic.py
+    upstream: ["get_xsd"]  
+    product:
+      nb: "{{products}}/parse_pydantic.ipynb"
+      json: "{{products}}/aop.json"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version}}"
+
+  - source: tasks/aopwiki_ontology_index.py
+    upstream: ["parse_pydantic"]
+    product:
+      nb: "{{products}}/aopwiki_ontology_index.ipynb"
+      json: "{{products}}/aopwiki_ontology_index.json"
+      summary: "{{products}}/aopwiki_ontology_summary.json"
+
+  - source: tasks/extract_kec.py
+    upstream: ["parse_pydantic"]
+    product:
+      nb: "{{products}}/{{model_key}}/extract_kec.ipynb"
+      json: "{{products}}/{{model_key}}/kec.json"
+      csv: "{{products}}/{{model_key}}/extract_kec_stats.csv"
+    params:
+      enabled: "{{extract_kec}}"
+      models: "{{models}}"
+      products: "{{products}}/{{model_key}}"
+      model_key: "{{model_key}}"
+      ke_filter: "{{ke_filter}}"
+
+
+  - source: tasks/validate_kec_iris.py
+    upstream: ["extract_kec"]
+    product:
+      nb: "{{products}}/{{model_key}}/validate_kec_iris.ipynb"
+      data: "{{products}}/{{model_key}}/validate_kec_iris.tsv"
+    params:
+      enabled: True
+      OLS_DELAY: 0.2
+      OLS_TIMEOUT: 15
+      OLS_RETRIES: 3
+
+  - source: tasks/ground_kec.py
+    upstream: ["extract_kec", "aopwiki_ontology_index"]
+    product:
+      nb: "{{products}}/{{model_key}}/ground_kec.ipynb"
+      json: "{{products}}/{{model_key}}/kec_grounded.json"
+      summary: "{{products}}/{{model_key}}/kec_grounding_summary.json"
+      tsv: "{{products}}/{{model_key}}/kec_grounding.tsv"
+    params:
+      dictionary_url: "https://api.ideaconsult.net/nanoreg1/dictionary"
+      preferred_ontologies: []   # set your preferred collection order, e.g. ["CHEBI","NCIT"]
+      rows: 10
+      timeout: 20
+      threads: 8
+
+  - source: tasks/compare_kec.py
+    upstream: ["extract_kec"]
+    product:
+      nb: "{{products}}/{{model_key}}/compare_kec.ipynb"
+      json: "{{products}}/{{model_key}}/kec_match_report.json"
+      tsv: "{{products}}/{{model_key}}/kec_match.tsv"
+      csv: "{{products}}/{{model_key}}/compare_kec_stats.csv"
+    params:
+      model_key: "{{model_key}}"
+      embedding_model: "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
+      tau: 0.75
+      use_embeddings: True
+
+  - source: tasks/kec_logprob_calibration.py
+    upstream: ["extract_kec"]
+    product:
+      nb: "{{products}}/{{model_key}}/kec_logprob_calibration.ipynb"
+      json: "{{products}}/{{model_key}}/kec_logprob_calibration.json"
+      tsv: "{{products}}/{{model_key}}/kec_logprob_calibration.tsv"
+      csv: "{{products}}/{{model_key}}/kec_logprob_calibration_stats.csv"
+    params:
+      model_key: "{{model_key}}"
+      embedding_model: "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
+      tau: 0.75
+      use_embeddings: True
+
+  - source: tasks/viz_kec_matching.py
+    upstream: ["extract_kec", "compare_kec"]
+    product:
+      nb: "{{products}}/{{model_key}}/viz_kec_matching.ipynb"
+      html: "{{products}}/{{model_key}}/viz_kec_matching.html"
+    params:
+      model_key: "{{model_key}}"
+      tau: 0.75
+
+  - source: tasks/audit_kec_truth.py
+    upstream: ["extract_kec", "parse_pydantic"]
+    product:
+      nb: "{{products}}/{{model_key}}/audit_kec_truth.ipynb"
+      json: "{{products}}/{{model_key}}/kec_truth_audit.json"
+      tsv: "{{products}}/{{model_key}}/kec_truth_audit.tsv"
+      csv: "{{products}}/{{model_key}}/audit_kec_truth_stats.csv"
+    params:
+      models: "{{models}}"
+      model_key: "{{model_key}}"
+      judge_model_key: "{{model_key}}"   # set to a different/stronger model to reduce bias
+      limit: null
+      enabled: True
+      
+
+  - source: tasks/model_summary.py
+    upstream: ["extract_kec", "compare_kec", "kec_logprob_calibration", "audit_kec_truth"]
+    product:
+      nb: "{{products}}/{{model_key}}/model_summary.ipynb"
+      csv: "{{products}}/{{model_key}}/model_summary.csv"
+    params:
+      models: "{{models}}"
+      model_key: "{{model_key}}"
+

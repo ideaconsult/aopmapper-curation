@@ -1,0 +1,120 @@
+# Exports crossmodel/SMAA results + figures into the manuscript repo, per section.
+# Re-run any time the underlying products change so results.md stays in sync without
+# hand-editing numbers or figures.
+#
+#   uv run ploomber build --entry-point pipeline.manuscript.yaml
+#
+# Each task below is independent (no shared upstream) so a single section can be
+# rebuilt with:
+#   uv run ploomber build --part export_kec116 --entry-point pipeline.manuscript.yaml --force
+
+executor: parallel
+
+meta:
+    extract_upstream: False
+
+tasks:
+  - source: tasks/export_manuscript_results.py
+    name: export_kec116
+    product:
+      nb:   "{{manuscript_repo}}/manuscript/generated/kec116_export.ipynb"
+      json: "{{manuscript_repo}}/manuscript/generated/kec116_stats.json"
+    params:
+      crossmodel_dir: "{{kec116_crossmodel_dir}}"
+      manuscript_repo: "{{manuscript_repo}}"
+      section_name: "kec116"
+      smaa_variants: "{{kec116_smaa_variants}}"
+      figures: "{{kec116_figures}}"
+      n_top_models: 8
+
+  - source: tasks/export_manuscript_results.py
+    name: export_kec_all
+    product:
+      nb:   "{{manuscript_repo}}/manuscript/generated/kec_all_export.ipynb"
+      json: "{{manuscript_repo}}/manuscript/generated/kec_all_stats.json"
+    params:
+      crossmodel_dir: "{{kec_all_crossmodel_dir}}"
+      manuscript_repo: "{{manuscript_repo}}"
+      section_name: "kec_all"
+      smaa_variants: "{{kec_all_smaa_variants}}"
+      figures: "{{kec_all_figures}}"
+      n_top_models: 8
+
+  - source: tasks/export_manuscript_results.py
+    name: export_assays
+    product:
+      nb:   "{{manuscript_repo}}/manuscript/generated/assays_export.ipynb"
+      json: "{{manuscript_repo}}/manuscript/generated/assays_stats.json"
+    params:
+      crossmodel_dir: "{{assays_crossmodel_dir}}"
+      manuscript_repo: "{{manuscript_repo}}"
+      section_name: "assays"
+      smaa_variants: "{{assays_smaa_variants}}"
+      figures: "{{assays_figures}}"
+      n_top_models: 8
+      # D5 (R1 §5.3): corpus-wide KEC-vs-assay agreement for this same panel — the
+      # signal neither track yields alone. Same file the aop451 task reads for its
+      # per-assay worked-example detail; here it is summarised over the whole corpus.
+      track_consistency_json: "{{aop451_track_consistency_json}}"
+      # distinct techniques vs per-KE assay records — from the Solr path, the only
+      # stage that consolidates assay names into techniques
+      technique_stats_json: "{{assay_technique_stats_json}}"
+      # Worked-example detail (§Step 4b "Worked example"): per-KE assay records read
+      # straight from each model's own assays.json, same mechanism the aop451 task
+      # uses. KE350 is the example results.md discusses — reused with the same two
+      # models as the AOP 451 section for continuity, both still in the panel.
+      assays_products_dir: "{{aop451_assays_products_dir}}"
+      worked_example_kes: ["KE350"]
+      worked_example_models: "{{aop451_models}}"
+      # panel-level support count for the worked example, from the same consensus
+      # clustering @tbl:assay-scale reports — the cluster-level stat, not tied to
+      # which model's own record is quoted for description/evidence/etc. above
+      viz_assay_consensus_json: "{{assays_crossmodel_dir}}/viz_assay_consensus.json"
+
+  - source: tasks/export_manuscript_results.py
+    name: export_aop451
+    product:
+      nb:   "{{manuscript_repo}}/manuscript/generated/aop451_export.ipynb"
+      json: "{{manuscript_repo}}/manuscript/generated/aop451_stats.json"
+    params:
+      manuscript_repo: "{{manuscript_repo}}"
+      section_name: "aop451"
+      products_dir: "{{aop451_kec_products_dir}}"
+      assays_products_dir: "{{aop451_assays_products_dir}}"
+      worked_example_kes: "{{aop451_kes}}"
+      worked_example_models: "{{aop451_models}}"
+      # D5 (response_plan.md, R1 §5.3): per-assay cross-track match detail for the same
+      # worked-example (KE, model) pairs, read from crossmodel_track_consistency's output
+      # (tasks/crossmodel_track_consistency.py, run via pipeline.assays_consensus.yaml).
+      # Optional — blank/missing path just omits the "track_consistency" block above.
+      track_consistency_json: "{{aop451_track_consistency_json}}"
+      # Recall against the published manual curation (Nymark et al. 2021 Figure 1) —
+      # the case study's headline numbers, from the aop451_reference_check task below.
+      # Scored per model against that reference, so it does not depend on crossmodel.
+      reference_check_json: "{{aop451_kec_products_dir}}/aop451_reference_check.json"
+      # Panel view for the same KEs: the assay consensus clusters, already built by
+      # crossmodel_assays, filtered to the case-study KEs and ordered by support. This
+      # is what @tbl:aop451-assays reports — the per-model reference_check above answers
+      # a different question (one model against the published panel).
+      viz_assay_consensus_json: "{{assays_crossmodel_dir}}/viz_assay_consensus.json"
+
+  # Fixed-fixture regression check against the published AOP 451 reference
+  # (resources/aop451_reference.json, transcribed from Nymark et al. 2021 Figure 1).
+  # Lives in aop4enm proper (not just the manuscript export) so it can be re-run any
+  # time the model panel or extraction pipeline changes — a "unit test" for KEC/assay
+  # extraction quality that happens to need live model output.
+  - source: tasks/aop451_reference_check.py
+    name: aop451_reference_check
+    product:
+      nb:   "{{aop451_kec_products_dir}}/aop451_reference_check.ipynb"
+      json: "{{aop451_kec_products_dir}}/aop451_reference_check.json"
+      csv:  "{{aop451_kec_products_dir}}/aop451_reference_check.csv"
+      md:   "{{aop451_kec_products_dir}}/aop451_reference_check.md"
+    params:
+      kec_products_dir: "{{aop451_kec_products_dir}}"
+      assays_products_dir: "{{aop451_assays_products_dir}}"
+      model_keys: "{{aop451_reference_check_models}}"
+      # Also score the POOLED panel against the same reference, under the same
+      # assay_match rule and tau as the per-model columns — otherwise the
+      # single-model and panel figures in the case study are not comparable.
+      viz_assay_consensus_json: "{{assays_crossmodel_dir}}/viz_assay_consensus.json"

@@ -1,0 +1,131 @@
+# Cross-model assay consensus, calibration, model selection & visualisation.
+#
+# Mirrors pipeline.consensus.yaml. Run ONCE after all models have been extracted via
+# pipeline.assays.yaml:
+#     ploomber build --entry-point pipeline.assays_consensus.yaml --env env.assays.yaml
+#
+# Per-model assay files live under {{products}}/assays/{{model_key}}/ (see pipeline.assays
+# .yaml), so the consensus stage uses {{products}}/assays as its product root. Assays have
+# NO ground truth: cross-model consensus is the correctness proxy. Calibration and
+# model_summary loop over model_keys internally (their label needs the cross-model
+# consensus), writing per-model files consumed by smaa_rank.
+executor: serial
+
+meta:
+    extract_upstream: False
+
+tasks:
+  # extract_assays now writes wiki-id ('KEnnn') keys directly, so no relabel needed.
+  - source: tasks/crossmodel_assays.py
+    product:
+      nb: "{{products}}/{{crossmodel}}/crossmodel_assays.ipynb"
+      consensus: "{{products}}/{{crossmodel}}/crossmodel_consensus.json"
+      pairwise: "{{products}}/{{crossmodel}}/crossmodel_pairwise.tsv"
+      summary: "{{products}}/{{crossmodel}}/crossmodel_summary.json"
+    params:
+      products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+      embedding_model: "{{embedding_model}}"
+      tau: "{{tau}}"
+      min_support: "{{min_support}}"
+
+  - source: tasks/assay_logprob_calibration.py
+    upstream: ["crossmodel_assays"]
+    product:
+      nb:   "{{products}}/{{crossmodel}}/assay_logprob_calibration.ipynb"
+      json: "{{products}}/{{crossmodel}}/assay_calibration_all.json"
+    params:
+      products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+      min_support: "{{min_support}}"
+
+  # D5 (response_plan.md, R1 §5.3): per-model KEC-vs-assay cross-track consistency.
+  # Reads BOTH product roots directly (kec_products, assay_products — configurable,
+  # no hardcoded paths), so it has no Ploomber upstream, like crossmodel_assays.
+  # Off by default (enabled: false in env.assays_consensus.yaml) — only meaningful once
+  # both tracks have been extracted for the same model panel + AOP-Wiki release.
+  - source: tasks/crossmodel_track_consistency.py
+    name: "crossmodel_track_consistency"
+    product:
+      nb:     "{{products}}/{{crossmodel}}/crossmodel_track_consistency.ipynb"
+      json:   "{{products}}/{{crossmodel}}/crossmodel_track_consistency.json"
+      tsv:    "{{products}}/{{crossmodel}}/crossmodel_track_consistency.tsv"
+      # per-assay audit table: KE, ASSAY, KE_KEC, ASSAY_KEC, matched?
+      detail: "{{products}}/{{crossmodel}}/crossmodel_track_consistency_detail.tsv"
+    params:
+      enabled: "{{track_consistency.enabled}}"
+      kec_products: "{{track_consistency.kec_products}}"
+      assay_products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+      embedding_model: "{{embedding_model}}"
+      tau: "{{track_consistency.tau}}"
+
+  - source: tasks/assay_model_summary.py
+    upstream: ["assay_logprob_calibration", "crossmodel_track_consistency"]
+    product:
+      nb:  "{{products}}/{{crossmodel}}/assay_model_summary.ipynb"
+      csv: "{{products}}/{{crossmodel}}/assay_model_summary_all.csv"
+    params:
+      products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+      # Always pointed at the D5 output path; column stays blank if
+      # track_consistency.enabled is false (file absent) — see assay_model_summary.py header.
+      track_consistency_json: "{{products}}/{{crossmodel}}/crossmodel_track_consistency.json"
+
+  - source: tasks/smaa_rank.py
+    name: "smaa_rank_assays"
+    upstream: ["assay_model_summary", "crossmodel_assays"]
+    product:
+      nb:  "{{products}}/{{crossmodel}}/{{ranking}}/smaa_rank.ipynb"
+      tsv: "{{products}}/{{crossmodel}}/{{ranking}}/smaa_rank.tsv"
+      json: "{{products}}/{{crossmodel}}/{{ranking}}/smaa_summary.json"
+      fig: "{{products}}/{{crossmodel}}/{{ranking}}/figures/fig_smaa_rank.png"
+    params:
+      products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+      # Criteria come from the named block selected by `ranking:` in
+      # env.assays_consensus.yaml (ranking_config). Switch config by name there.
+      ranking_config: "{{ranking_config}}"
+      ranking: "{{ranking}}"
+      summary_filename: "assay_model_summary.csv"
+      denominator_col: "n_assays"
+      require_criterion: "consensus_agreement"
+      consensus_upstream: "crossmodel_assays"
+      n_iter: 10000
+
+  - source: tasks/viz_assay_consensus.py
+    upstream: ["crossmodel_assays", "crossmodel_track_consistency"]
+    product:
+      nb: "{{products}}/{{crossmodel}}/viz_assay_consensus.ipynb"
+      html: "{{products}}/{{crossmodel}}/viz_assay_consensus.html"
+      data: "{{products}}/{{crossmodel}}/viz_assay_consensus.json"
+    params:
+      products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+      # Solr publish gate (tasks/assay_consensus2solr.py), so the report's accept/drop
+      # color matches what will actually be indexed rather than crossmodel's own
+      # clustering-report `min_support`. Keep in sync with env.yaml's assay_min_support.
+      assay_min_support: "{{assay_min_support}}"
+      # optional (D5, R1 §5.3): per-assay cross-track match detail — same file the
+      # aop451 export reads, produced by pipeline.assays_consensus.yaml's own
+      # crossmodel_track_consistency task when track_consistency.enabled: true above.
+      # Blank/missing path just omits the cross-track column.
+      track_consistency_json: "{{products}}/{{crossmodel}}/crossmodel_track_consistency.json"
+
+  - source: tasks/figures_assays.py
+    upstream: ["crossmodel_assays"]
+    product:
+      nb: "{{products}}/{{crossmodel}}/figures_assays.ipynb"
+      dir: "{{products}}/{{crossmodel}}/figures"
+    params:
+      products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+
+  - source: tasks/usage_stats.py
+    product:
+      nb: "{{products}}/{{crossmodel}}/usage_stats.ipynb"
+      csv: "{{products}}/{{crossmodel}}/usage_stats.csv"
+    params:
+      products: "{{products}}/assays"
+      model_keys: "{{model_keys}}"
+      sidecar_name: "assays_logprobs.jsonl"
