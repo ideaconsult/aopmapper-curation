@@ -18,10 +18,10 @@ tasks:
   # extract_assays now writes wiki-id ('KEnnn') keys directly, so no relabel needed.
   - source: tasks/crossmodel_assays.py
     product:
-      nb: "{{products}}/{{crossmodel}}/crossmodel_assays.ipynb"
-      consensus: "{{products}}/{{crossmodel}}/crossmodel_consensus.json"
-      pairwise: "{{products}}/{{crossmodel}}/crossmodel_pairwise.tsv"
-      summary: "{{products}}/{{crossmodel}}/crossmodel_summary.json"
+      nb: "{{products}}/crossmodel/{{crossmodel}}/crossmodel_assays.ipynb"
+      consensus: "{{products}}/crossmodel/{{crossmodel}}/crossmodel_consensus.json"
+      pairwise: "{{products}}/crossmodel/{{crossmodel}}/crossmodel_pairwise.tsv"
+      summary: "{{products}}/crossmodel/{{crossmodel}}/crossmodel_summary.json"
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
@@ -32,8 +32,8 @@ tasks:
   - source: tasks/assay_logprob_calibration.py
     upstream: ["crossmodel_assays"]
     product:
-      nb:   "{{products}}/{{crossmodel}}/assay_logprob_calibration.ipynb"
-      json: "{{products}}/{{crossmodel}}/assay_calibration_all.json"
+      nb:   "{{products}}/crossmodel/{{crossmodel}}/assay_logprob_calibration.ipynb"
+      json: "{{products}}/crossmodel/{{crossmodel}}/assay_calibration_all.json"
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
@@ -47,11 +47,11 @@ tasks:
   - source: tasks/crossmodel_track_consistency.py
     name: "crossmodel_track_consistency"
     product:
-      nb:     "{{products}}/{{crossmodel}}/crossmodel_track_consistency.ipynb"
-      json:   "{{products}}/{{crossmodel}}/crossmodel_track_consistency.json"
-      tsv:    "{{products}}/{{crossmodel}}/crossmodel_track_consistency.tsv"
+      nb:     "{{products}}/crossmodel/{{crossmodel}}/crossmodel_track_consistency.ipynb"
+      json:   "{{products}}/crossmodel/{{crossmodel}}/crossmodel_track_consistency.json"
+      tsv:    "{{products}}/crossmodel/{{crossmodel}}/crossmodel_track_consistency.tsv"
       # per-assay audit table: KE, ASSAY, KE_KEC, ASSAY_KEC, matched?
-      detail: "{{products}}/{{crossmodel}}/crossmodel_track_consistency_detail.tsv"
+      detail: "{{products}}/crossmodel/{{crossmodel}}/crossmodel_track_consistency_detail.tsv"
     params:
       enabled: "{{track_consistency.enabled}}"
       kec_products: "{{track_consistency.kec_products}}"
@@ -63,23 +63,23 @@ tasks:
   - source: tasks/assay_model_summary.py
     upstream: ["assay_logprob_calibration", "crossmodel_track_consistency"]
     product:
-      nb:  "{{products}}/{{crossmodel}}/assay_model_summary.ipynb"
-      csv: "{{products}}/{{crossmodel}}/assay_model_summary_all.csv"
+      nb:  "{{products}}/crossmodel/{{crossmodel}}/assay_model_summary.ipynb"
+      csv: "{{products}}/crossmodel/{{crossmodel}}/assay_model_summary_all.csv"
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
       # Always pointed at the D5 output path; column stays blank if
       # track_consistency.enabled is false (file absent) — see assay_model_summary.py header.
-      track_consistency_json: "{{products}}/{{crossmodel}}/crossmodel_track_consistency.json"
+      track_consistency_json: "{{products}}/crossmodel/{{crossmodel}}/crossmodel_track_consistency.json"
 
   - source: tasks/smaa_rank.py
     name: "smaa_rank_assays"
     upstream: ["assay_model_summary", "crossmodel_assays"]
     product:
-      nb:  "{{products}}/{{crossmodel}}/{{ranking}}/smaa_rank.ipynb"
-      tsv: "{{products}}/{{crossmodel}}/{{ranking}}/smaa_rank.tsv"
-      json: "{{products}}/{{crossmodel}}/{{ranking}}/smaa_summary.json"
-      fig: "{{products}}/{{crossmodel}}/{{ranking}}/figures/fig_smaa_rank.png"
+      nb:  "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/smaa_rank.ipynb"
+      tsv: "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/smaa_rank.tsv"
+      json: "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/smaa_summary.json"
+      fig: "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/figures/fig_smaa_rank.png"
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
@@ -96,9 +96,9 @@ tasks:
   - source: tasks/viz_assay_consensus.py
     upstream: ["crossmodel_assays", "crossmodel_track_consistency"]
     product:
-      nb: "{{products}}/{{crossmodel}}/viz_assay_consensus.ipynb"
-      html: "{{products}}/{{crossmodel}}/viz_assay_consensus.html"
-      data: "{{products}}/{{crossmodel}}/viz_assay_consensus.json"
+      nb: "{{products}}/crossmodel/{{crossmodel}}/viz_assay_consensus.ipynb"
+      html: "{{products}}/crossmodel/{{crossmodel}}/viz_assay_consensus.html"
+      data: "{{products}}/crossmodel/{{crossmodel}}/viz_assay_consensus.json"
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
@@ -110,21 +110,21 @@ tasks:
       # aop451 export reads, produced by pipeline.assays_consensus.yaml's own
       # crossmodel_track_consistency task when track_consistency.enabled: true above.
       # Blank/missing path just omits the cross-track column.
-      track_consistency_json: "{{products}}/{{crossmodel}}/crossmodel_track_consistency.json"
+      track_consistency_json: "{{products}}/crossmodel/{{crossmodel}}/crossmodel_track_consistency.json"
 
   - source: tasks/figures_assays.py
     upstream: ["crossmodel_assays"]
     product:
-      nb: "{{products}}/{{crossmodel}}/figures_assays.ipynb"
-      dir: "{{products}}/{{crossmodel}}/figures"
+      nb: "{{products}}/crossmodel/{{crossmodel}}/figures_assays.ipynb"
+      dir: "{{products}}/crossmodel/{{crossmodel}}/figures"
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
 
   - source: tasks/usage_stats.py
     product:
-      nb: "{{products}}/{{crossmodel}}/usage_stats.ipynb"
-      csv: "{{products}}/{{crossmodel}}/usage_stats.csv"
+      nb: "{{products}}/crossmodel/{{crossmodel}}/usage_stats.ipynb"
+      csv: "{{products}}/crossmodel/{{crossmodel}}/usage_stats.csv"
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
