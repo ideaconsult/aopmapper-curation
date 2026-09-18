@@ -3,8 +3,8 @@ assay_models.py — shared Methods2AOP assay-record schema. LIBRARY, not a task.
 
 `AssayRecord` is the per-assay metadata shape tasks/extract_assays.py extracts from a
 Key Event's measurement_methodology text. It is imported here (rather than defined
-inline in extract_assays.py) so tasks/assay_consensus2solr.py can build Solr documents
-against the exact same field set, without re-declaring field names by hand.
+inline in extract_assays.py) so downstream consumers, such as a publishing stage, can
+build documents against the exact same field set without re-declaring field names by hand.
 
 Import-safe (no module-level side effects), unlike the Ploomber task scripts —
 extract_assays.py dereferences injected params at import time, so its own definitions

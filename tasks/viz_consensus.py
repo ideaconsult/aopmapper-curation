@@ -21,9 +21,9 @@ triples that only non-subset models confirmed correctly fall back to "not found"
 page shows exactly what the selected ensemble produces. Default (off) is unchanged: all
 models.
 
-The support-bar color in the rendered page reflects min_support_ensemble, the SAME
-threshold tasks/build_kec_enrichment.py applies to decide whether a cluster reaches
-Solr (`support < min_support_ensemble` -> dropped). It is deliberately NOT a fraction-
+The support-bar color in the rendered page reflects min_support_ensemble, the minimum
+support a cluster needs to be accepted for publishing (`support < min_support_ensemble`
+-> dropped; the publishing stage itself is not part of this repo). It is deliberately NOT a fraction-
 of-panel heatmap: with a small model panel a real, indexable cluster can have a low
 support/n ratio while still clearing the actual accept bar, and coloring by ratio alone
 made those look rejected. min_support (the crossmodel_compare clustering threshold) is
@@ -34,7 +34,7 @@ Ploomber:
   product:  {"html": shell, "data": render-ready JSON}
   params:   products, model_keys; optional restrict_to_ensemble + min_support to show
             only the recommended subset; min_support_ensemble for the accept/drop color
-            (should match env.yaml's value, the actual Solr gate in build_kec_enrichment.py).
+            (set in env.consensus.yaml).
 """
 from __future__ import annotations
 
@@ -54,8 +54,7 @@ model_keys = []
 # upstream). Off by default → all models, exactly as before.
 restrict_to_ensemble = False
 min_support = 2                # consensus threshold, for recomputed counts when restricting
-# accept/drop color threshold — MUST match env.yaml's min_support_ensemble, the actual
-# gate tasks/build_kec_enrichment.py applies before a cluster reaches Solr.
+# accept/drop color threshold; overridden by env.consensus.yaml's min_support_ensemble.
 min_support_ensemble = 1
 # -
 
@@ -115,9 +114,9 @@ function slot(s, withLp){
     out += `<span class="logprob">lp=${s.lp.toFixed(3)} ${'█'.repeat(bar)}${'░'.repeat(10-bar)}</span>`; }
   return out;
 }
-let MIN_SUPPORT_ENSEMBLE=1;   // set from data.summary in render(); the Solr accept/drop gate
+let MIN_SUPPORT_ENSEMBLE=1;   // set from data.summary in render(); the publish accept/drop gate
 function supportBar(support,n){
-  // Color reflects the SAME threshold build_kec_enrichment.py uses to gate Solr indexing
+  // Color reflects the publish acceptance threshold
   // (support < min_support_ensemble -> dropped), not a fraction-of-panel heatmap — with a
   // small model panel, a real indexable cluster can have a low support/n ratio.
   const accepted = support>=MIN_SUPPORT_ENSEMBLE;
@@ -321,8 +320,8 @@ def _build_data(consensus: dict, summary_data: dict, gt_by_ke: dict,
     else:
         hist = summ.get("support_histogram") or {}
         n_clusters = summ.get("n_clusters", 0)
-    # Counted against min_support_ensemble — the gate build_kec_enrichment.py applies before
-    # a cluster reaches Solr — NOT crossmodel_compare's clustering min_support. This report
+    # Counted against min_support_ensemble - the publish acceptance threshold - NOT
+    # crossmodel_compare's clustering min_support. This report
     # is the manual go/no-go for publishing, so its headline count and its per-cluster bar
     # colors must both mean "will be indexed". crossmodel_compare's own precomputed
     # n_consensus_clusters is min_support-based and so is deliberately not reused, even in

@@ -10,7 +10,7 @@ the source.
 
 Like viz_consensus.py, the consolidated per-KE cluster data (support, models, the
 representative AssayRecord, members) is written to product["data"] as JSON alongside
-the HTML — so other tasks (tasks/assay_consensus2solr.py) can consume the same
+the HTML — so downstream consumers (e.g. a publishing stage) can consume the same
 already-KEnnn-keyed, per-KE-grouped view without re-reading crossmodel_assays' raw
 consensus file and redoing the wiki-id translation.
 
@@ -39,8 +39,8 @@ model_keys = []
 # KEC run. Written before this viz existed (crossmodel_track_consistency.py's docstring
 # calls its detail TSV "curator-readable" but nothing rendered it until now).
 track_consistency_json = None
-# accept/drop color threshold — MUST match env.yaml's assay_min_support, the actual
-# gate tasks/assay_consensus2solr.py applies before a cluster reaches the index.
+# accept/drop color threshold; overridden by env.assays_consensus.yaml's assay_min_support,
+# the publish acceptance threshold.
 # Deliberately NOT the same as crossmodel's own `min_support` (the clustering-report
 # threshold, shown separately in the info line): the bar previously coloured by
 # support/n_models as a fixed-fraction gradient, so on an 11-model panel a cluster at
@@ -263,7 +263,7 @@ if enabled:
   <span style="color:#888;font-size:12px">{len(clusters)} assays, {n_idx} indexed</span>
 </summary>{inner}</details>""")
         # data sidecar: same per-KE grouping the HTML renders from, keyed by the
-        # resolved KEnnn wiki-id so downstream consumers (assay_consensus2solr) don't
+        # resolved KEnnn wiki-id so downstream consumers don't
         # need to redo the uuid->wiki-id translation.
         data_kes.append({
             "ke_id": ke_label,

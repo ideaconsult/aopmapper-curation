@@ -102,9 +102,9 @@ tasks:
     params:
       products: "{{products}}/assays"
       model_keys: "{{model_keys}}"
-      # Solr publish gate (tasks/assay_consensus2solr.py), so the report's accept/drop
-      # color matches what will actually be indexed rather than crossmodel's own
-      # clustering-report `min_support`. Keep in sync with env.yaml's assay_min_support.
+      # Publish acceptance threshold, so the report's accept/drop color matches what will
+      # actually be published rather than crossmodel's own clustering-report `min_support`
+      # (env.assays_consensus.yaml's assay_min_support).
       assay_min_support: "{{assay_min_support}}"
       # optional (D5, R1 §5.3): per-assay cross-track match detail — same file the
       # aop451 export reads, produced by pipeline.assays_consensus.yaml's own

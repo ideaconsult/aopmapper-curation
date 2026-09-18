@@ -49,7 +49,7 @@ worked_example_kes = []      # e.g. ["KE870", "KE1496", "KE1497"] — reused acr
 worked_example_models = []   # model_keys to pull per-KE detail from, e.g. the two SMAA leaders
 track_consistency_json = None  # optional: crossmodel_track_consistency.json (D5) — adds
                                 # per-assay cross-track match detail to each worked example
-technique_stats_json = None    # optional: assay_consensus2solr's stats product — distinct
+technique_stats_json = None    # optional: publish stage's stats product (not in this repo) — distinct
                                 # techniques vs per-KE assay records, and reuse examples
 reference_check_json = None    # optional: aop451_reference_check.py's json — recall against
                                 # the published manual curation (the one outside reference)
@@ -311,7 +311,7 @@ def _reference_check(path: str | None) -> dict | None:
 
 def _technique_stats(path: str | None) -> dict | None:
     """Technique-vs-record counts and the most-reused techniques, from
-    assay_consensus2solr's `stats` product (tasks/assay_consensus2solr.py).
+    the publish stage's `stats` product (not part of this repo).
 
     The crossmodel stage counts assay records *per Key Event*: one technique described in
     twenty Key Events is twenty records. Name consolidation into distinct techniques only
