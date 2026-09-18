@@ -53,7 +53,9 @@ Ploomber:
             prefilter) + smaa_topn to couple with the SMAA ranking (its summary path is
             read from the smaa_rank upstream, not passed);
             target (kec|kec_plus_grounded) + grounded_match_levels + grounded_min_support;
-            ensemble_mode (greedy|ilp) — see above.
+            ensemble_mode (greedy|ilp|pareto_topsis|pareto_smaa, or greedy_none|
+            greedy_tiebreak|greedy_prefilter to run greedy with that smaa_link into its
+            own product directory) — see above.
 """
 from __future__ import annotations
 
@@ -382,6 +384,14 @@ def _solve_ilp(covered: dict, universe: set, budget: int | None,
 
 if enabled:
     prod = Path(products)
+
+    # The product path is keyed on ensemble_mode, so encoding the SMAA coupling in the mode
+    # name lets all three greedy variants sit side by side instead of overwriting "greedy".
+    GREEDY_VARIANTS = {"greedy_none": "none", "greedy_tiebreak": "tiebreak",
+                       "greedy_prefilter": "prefilter"}
+    if ensemble_mode in GREEDY_VARIANTS:
+        smaa_link = GREEDY_VARIANTS[ensemble_mode]
+        logger.info(f"ensemble_mode={ensemble_mode}: greedy with smaa_link={smaa_link}")
 
     present = list(model_keys or [])
     if not present:                     # fall back to the consensus panel

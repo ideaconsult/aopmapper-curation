@@ -104,6 +104,45 @@ def _smaa_variant_stats(crossmodel: Path, variant: str) -> dict | None:
     }
 
 
+#: Ensemble modes read per SMAA variant. The greedy_* names are greedy runs with an explicit
+#: smaa_link (see select_ensemble.GREEDY_VARIANTS), each in its own product directory.
+ENSEMBLE_MODES = ("greedy", "greedy_none", "greedy_tiebreak", "greedy_prefilter",
+                  "ilp", "pareto_smaa", "pareto_topsis")
+
+#: smaa_criteria.tsv column -> direction; must match select_ensemble.QUALITY_DIRECTION.
+QUALITY_COLUMNS = {"topsis_score": "higher", "expected_rank": "lower"}
+
+
+def _panel_quality(crossmodel: Path, variant: str, column: str) -> dict:
+    """{model: quality in [0,1]} scaled exactly as select_ensemble._load_quality does -
+    min-max over the whole panel in smaa_criteria.tsv, inverted for lower-is-better - so a
+    mean over any selected set is on the same scale as the pareto modes' mean_quality."""
+    p = crossmodel / variant / "smaa_criteria.tsv"
+    if not p.exists():
+        return {}
+    raw = {}
+    with open(p, encoding="utf-8") as f:
+        for row in csv.DictReader(f, delimiter="\t"):
+            try:
+                raw[row["model"]] = float(row[column])
+            except (KeyError, TypeError, ValueError):
+                continue
+    if not raw:
+        return {}
+    if QUALITY_COLUMNS[column] == "lower":
+        raw = {m: -v for m, v in raw.items()}
+    lo, hi = min(raw.values()), max(raw.values())
+    if hi <= lo:
+        return {m: 1.0 for m in raw}
+    return {m: (v - lo) / (hi - lo) for m, v in raw.items()}
+
+
+def _mean_quality(models: list[str], quality: dict) -> float | None:
+    if not models or not quality:
+        return None
+    return round(sum(quality.get(m, 0.0) for m in models) / len(models), 4)
+
+
 def _ensemble_summary(crossmodel: Path, variant: str, ensemble_mode: str = "greedy") -> dict | None:
     """Reads {crossmodel}/{variant}/{ensemble_mode}/ensemble_summary.json —
     ensemble_mode "greedy" (set-cover heuristic), "ilp" (exact max-coverage via MILP),
@@ -147,6 +186,9 @@ def _ensemble_summary(crossmodel: Path, variant: str, ensemble_mode: str = "gree
         "n_recommended_models": len(summary.get("recommended_models", [])),
         "n_candidate_models": summary.get("n_candidate_models"),
         "n_skipped_models": summary.get("n_skipped_models"),
+        # run settings (smaa_link, smaa_topn, budget, ...) so each table row is traceable
+        # to the configuration that produced it
+        "params": summary.get("params"),
     }
     # pareto modes only: the lambda sweep is the frontier table in results.md, and the
     # adopted operating point is knee_lam — both quoted per-row, so both come from here.
@@ -161,6 +203,7 @@ def _ensemble_summary(crossmodel: Path, variant: str, ensemble_mode: str = "gree
                 "coverage_frac": r.get("coverage_frac"),
                 "kec_frac": r.get("kec_frac"),
                 "mean_quality": r.get("mean_quality"),
+                "models": r.get("models", []),
             }
             for r in summary["pareto_frontier"]
         ]
@@ -626,10 +669,28 @@ if enabled:
             variant_ensembles = {}
             # pareto_smaa is the adopted selection (results.md @tbl:pareto); pareto_topsis
             # is the alternative-quality-score comparison the same section reports.
-            for mode in ("greedy", "ilp", "pareto_smaa", "pareto_topsis"):
+            for mode in ENSEMBLE_MODES:
                 ens = _ensemble_summary(crossmodel, variant, mode)
                 if ens is not None:
                     variant_ensembles[mode] = ens
+            # @tbl:ensemble-strategies: every strategy's quality on one common scale, and
+            # its overlap with plain greedy - computed here, not in select_ensemble, because
+            # greedy/ilp never load quality and no single run sees the other runs' picks.
+            q_topsis = _panel_quality(crossmodel, variant, "topsis_score")
+            q_smaa = _panel_quality(crossmodel, variant, "expected_rank")
+            base = variant_ensembles.get("greedy_none") or variant_ensembles.get("greedy")
+            base_models = set(base["recommended_models"]) if base else set()
+            for mode, ens in variant_ensembles.items():
+                rec = ens["recommended_models"]
+                ens["mean_quality_topsis"] = _mean_quality(rec, q_topsis)
+                ens["mean_quality_smaa"] = _mean_quality(rec, q_smaa)
+                if base_models:
+                    ens["n_overlap_greedy"] = len(set(rec) & base_models)
+                    ens["n_greedy"] = len(base_models)
+                for row in ens.get("pareto_frontier", []):
+                    row["mean_quality_topsis"] = _mean_quality(row["models"], q_topsis)
+                    if base_models:
+                        row["n_overlap_greedy"] = len(set(row["models"]) & base_models)
             if "greedy" in variant_ensembles and "ilp" in variant_ensembles:
                 g_models = set(variant_ensembles["greedy"]["recommended_models"])
                 i_models = set(variant_ensembles["ilp"]["recommended_models"])
