@@ -14,4 +14,8 @@ Steps map to the paper as: `pipeline.kec.yaml` (KEC extraction) →
 `pipeline.assays.yaml` + `pipeline.assays_consensus.yaml` (assay track, mirrors KEC) →
 `pipeline.manuscript.yaml` (AOP 451 case study + manuscript figures/tables/stats export).
 
+`pipeline.wikidiff.yaml` sits outside that chain: it parses two AOP-Wiki quarterly releases
+and diffs Key Events, their free-text fields and their curated KEC triples (`tasks/wiki_diff.py`),
+which is where the Discussion's "a quarter of curation adds four triples" figures come from.
+
 Task scripts live under `tasks/`. Tests: `uv run pytest`.

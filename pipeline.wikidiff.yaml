@@ -1,0 +1,56 @@
+executor: serial
+
+meta:
+    extract_upstream: False
+
+tasks:
+  - source: tasks/get_xsd.py
+    name: "get_xsd_{{version_old}}"
+    product:
+      nb: "{{products}}/{{version_old}}/get_xsd.ipynb"
+      xsd: "{{products}}/{{version_old}}/aop.xsd"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version_old}}"
+
+  - source: tasks/get_xsd.py
+    name: "get_xsd_{{version_new}}"
+    product:
+      nb: "{{products}}/{{version_new}}/get_xsd.ipynb"
+      xsd: "{{products}}/{{version_new}}/aop.xsd"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version_new}}"      
+
+  - source: tasks/parse_pydantic.py
+    name: "parse_pydantic_{{version_old}}"
+    upstream: ["get_xsd_{{version_old}}"]
+    product:
+      nb: "{{products}}/{{version_old}}/parse_pydantic.ipynb"
+      json: "{{products}}/{{version_old}}/aop.json"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version_old}}"
+
+  - source: tasks/parse_pydantic.py
+    name: "parse_pydantic_{{version_new}}"
+    upstream: ["get_xsd_{{version_new}}"]
+    product:
+      nb: "{{products}}/{{version_new}}/parse_pydantic.ipynb"
+      json: "{{products}}/{{version_new}}/aop.json"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version_new}}"      
+
+  - source: tasks/diff_wiki_releases.py
+    upstream: ["parse_pydantic_{{version_old}}", "parse_pydantic_{{version_new}}"]
+    product:
+      nb: "{{products}}/diff_wiki_releases.ipynb"
+      json: "{{products}}/wiki_release_diff.json"
+      csv: "{{products}}/wiki_release_diff_summary.csv"
+      ke_tsv: "{{products}}/wiki_release_diff_ke.tsv"
+      term_tsv: "{{products}}/wiki_release_diff_terms.tsv"
+      md: "{{products}}/wiki_release_diff.md"
+    params:
+      version_old: "{{version_old}}"
+      version_new: "{{version_new}}"

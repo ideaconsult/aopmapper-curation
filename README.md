@@ -54,6 +54,7 @@ uv run ploomber build -e <pipeline.yaml> [--env--<key> <value> ...]
 | Step 2 — cross-model KEC consensus, SMAA/TOPSIS ranking, ensemble selection | `pipeline.consensus.yaml` + `env.consensus.yaml` | reads every model's `kec.json` under `{{products}}` |
 | Step 3 — assay (Methods2AOP) extraction, then cross-model consensus | `pipeline.assays.yaml` + `env.assays.yaml`, then `pipeline.assays_consensus.yaml` + `env.assays_consensus.yaml` | mirrors the KEC track |
 | Step 4 — AOP 451 case study + manuscript figures/tables | `pipeline.manuscript.yaml` + `env.manuscript.yaml` (copy from `env.manuscript.yaml.example`) | exports into an external manuscript repo you supply via `manuscript_repo:`; the case-study check itself (`aop451_reference_check`) runs against `resources/aop451_reference.json`, transcribed from Nymark et al. (2021, PMID 35295099) |
+| Supporting — AOP-Wiki release diff | `pipeline.wikidiff.yaml` + `env.wikidiff.yaml` | independent of the extraction tracks: parses two quarterly releases and diffs Key Events, their free-text fields and their curated KEC triples, so the rate at which the structured layer actually grows can be measured. Needs both XML exports under `resources/aopwiki/` |
 
 `env.kec.yaml`'s `models:` registry lists the exact ~60-model panel used in the paper.
 Most entries assume a private inference backend and will need your own `base_url`
