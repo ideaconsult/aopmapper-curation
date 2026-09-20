@@ -128,6 +128,23 @@ pareto_lambdas = [0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0]
 # their own column via PARETO_MODE_COLUMN. "topsis_score" combines every active SMAA
 # criterion via entropy weights, so nothing here is hand-picked.
 quality_column = "topsis_score"
+# Cross-validation of the selection procedure ("pareto*" modes; 0 = off). The coverage
+# numbers every other mode reports are RESUBSTITUTION figures: the objective maximises
+# coverage of the curated triples, and the same triples are then used to report how much
+# the chosen subset covers. That answers "how much did the selected panel recover here",
+# not "how much would this selection PROCEDURE recover on Key Events it did not see".
+# With crossval_folds = k, the annotated Key Events are split into k folds; for each fold
+# the whole selection is re-solved on the other k-1 folds only and scored on the held-out
+# one, so the reported mean is an out-of-sample estimate and the gap against the in-sample
+# figure is the optimism. Splitting is by KEY EVENT, never by triple — two triples of one
+# Key Event share a description and would leak across the split.
+crossval_folds = 0
+crossval_seed = 0
+# lams to cross-validate. Each is k extra exact re-solves on a smaller universe, so this
+# is cheap; no LLM is re-run, the extractions are already on disk. Keep 0.0 in the list:
+# it is the only lam whose objective has no quality term, hence the one estimate with no
+# leakage at all through per-model quality (see _crossval_pareto).
+crossval_lambdas = [0.0, 32.0]
 # -
 
 try:
@@ -380,6 +397,109 @@ def _solve_ilp(covered: dict, universe: set, budget: int | None,
     return selected, n_covered, result.message
 
 
+def _fold_assignment(ke_ids: list[str], gt_counts: dict, k: int, seed: int) -> dict:
+    """{ke_id: fold index} — k folds over KEY EVENTS, stratified by how many curated
+    triples each Key Event carries so the folds carry comparable reference mass.
+
+    Splitting by Key Event rather than by triple is the point: the two triples of one
+    Key Event are extracted from the same description, so putting one in train and the
+    other in test would let the selection see the held-out text.
+    """
+    import random
+    rng = random.Random(seed)
+    # stratify: bucket KEs by triple count, shuffle within bucket, then deal round-robin
+    # so each fold gets a similar mix of 1-triple and many-triple Key Events.
+    buckets: dict[int, list[str]] = {}
+    for ke in ke_ids:
+        buckets.setdefault(gt_counts[ke], []).append(ke)
+    assignment, cursor = {}, 0
+    for n in sorted(buckets):
+        group = sorted(buckets[n])
+        rng.shuffle(group)
+        for ke in group:
+            assignment[ke] = cursor % k
+            cursor += 1
+    return assignment
+
+
+def _crossval_pareto(covered: dict, kec_items: set, grounded_targets: dict,
+                     gt_counts: dict, quality: dict, budget, lams, k: int,
+                     seed: int) -> dict:
+    """Out-of-sample estimate of what the SELECTION PROCEDURE recovers.
+
+    For each fold: rebuild the target universe from the training Key Events only, re-solve
+    the same joint objective at each lam, then score the resulting subset on the held-out
+    Key Events' curated triples. Reported per lam as mean +/- sd over folds, beside the
+    in-sample figure for the same lam, so the optimism is the difference.
+
+    Scoring is on CURATED triples only, never on grounded-novel targets. A grounded-novel
+    target exists because several models proposed it, so "covering" one on a held-out Key
+    Event is close to tautological and would not measure generalisation. The curated
+    triples are the one component of the universe with an origin outside the panel.
+
+    Leakage caveat, stated because it bounds what the number means: q_m is derived from
+    each model's agreement with the curated reference over ALL Key Events, so at lam > 0
+    the quality term carries a little information about the held-out fold. It enters only
+    as a per-model penalty and cannot select a target, so the effect is second order, but
+    the lam = 0 row has no quality term at all and is therefore the clean estimate.
+    """
+    ke_ids = sorted(gt_counts)
+    k = min(int(k), len(ke_ids))
+    if k < 2:
+        logger.warning(f"crossval_folds resolves to {k} — need >= 2; skipping")
+        return {}
+    assignment = _fold_assignment(ke_ids, gt_counts, k, seed)
+    by_fold: dict[int, set] = {}
+    for ke, f in assignment.items():
+        by_fold.setdefault(f, set()).add(ke)
+
+    out = {"n_folds": k, "seed": seed, "scored_on": "curated_triples_of_held_out_kes",
+           "per_lam": []}
+    for lam in lams:
+        rows = []
+        for f in sorted(by_fold):
+            test_kes = by_fold[f]
+            train_kec = {t for t in kec_items if t[1] not in test_kes}
+            train_grounded = {t for t in grounded_targets if t[1] not in test_kes}
+            test_kec = {t for t in kec_items if t[1] in test_kes}
+            if not train_kec or not test_kec:
+                continue
+            sel, _n, status = _solve_ilp(covered, train_kec | train_grounded, budget,
+                                         quality, float(lam))
+            if not sel:
+                logger.warning(f"crossval lam={lam} fold={f}: no models selected — skipped")
+                continue
+            got = set().union(*(covered[m] for m in sel)) & test_kec
+            rows.append({
+                "fold": f, "n_models": len(sel), "n_test_kes": len(test_kes),
+                "n_test_triples": len(test_kec), "n_recovered": len(got),
+                "curated_frac": round(len(got) / len(test_kec), 4),
+                "solver_status": status,
+            })
+        if not rows:
+            continue
+        fracs = [r["curated_frac"] for r in rows]
+        mean = sum(fracs) / len(fracs)
+        var = sum((x - mean) ** 2 for x in fracs) / (len(fracs) - 1) if len(fracs) > 1 else 0.0
+        # pooled: total recovered over total held-out triples, so folds are weighted by
+        # their triple count rather than counted equally
+        tot_rec = sum(r["n_recovered"] for r in rows)
+        tot_tri = sum(r["n_test_triples"] for r in rows)
+        sizes = [r["n_models"] for r in rows]
+        out["per_lam"].append({
+            "lam": float(lam),
+            "mean_curated_frac": round(mean, 4),
+            "sd_curated_frac": round(var ** 0.5, 4),
+            "pooled_curated_frac": round(tot_rec / tot_tri, 4) if tot_tri else 0.0,
+            "n_models_range": [min(sizes), max(sizes)],
+            "folds": rows,
+        })
+        logger.info(f"crossval lam={lam:<6} held-out curated = {mean:.4f} "
+                    f"(sd {var**0.5:.4f}, pooled {tot_rec}/{tot_tri}), "
+                    f"ensemble size {min(sizes)}-{max(sizes)}")
+    return out
+
+
 # ── main ───────────────────────────────────────────────────────────────────────
 
 if enabled:
@@ -557,6 +677,22 @@ if enabled:
         logger.info(f"pareto knee: lam={knee['lam']} {rec_n} models, "
                     f"coverage={rec_frac:.4f}, mean_quality={knee['mean_quality']:.4f}")
 
+        # ── out-of-sample check on the selection procedure (off unless crossval_folds) ──
+        # The kec_frac reported above is in-sample: the objective maximised coverage of
+        # exactly the triples it is then scored on. This re-runs the whole selection k
+        # times on Key Event subsets and scores each on the held-out Key Events.
+        crossval = {}
+        if int(crossval_folds or 0) >= 2:
+            crossval = _crossval_pareto(
+                covered, kec_items, grounded_targets, gt_counts, quality, budget,
+                crossval_lambdas or [knee["lam"]], int(crossval_folds), int(crossval_seed))
+            in_sample = {r["lam"]: r["kec_frac"] for r in frontier}
+            for row in crossval.get("per_lam", []):
+                ref = in_sample.get(row["lam"])
+                if ref is not None:
+                    row["in_sample_curated_frac"] = ref
+                    row["optimism"] = round(ref - row["mean_curated_frac"], 4)
+
         per_ke = {}
         for ke_id, n_gt in sorted(gt_counts.items()):
             covering = {}
@@ -630,11 +766,30 @@ if enabled:
                             c["n_unique_triples"], ";".join(c["unique_triples_ke"])])
         logger.info(f"wrote {OUT_MODELS.name}")
 
+        # companion TSV: out-of-sample estimate per lam, one row per lam, so the optimism
+        # of the headline coverage figure is readable without opening the JSON.
+        if crossval.get("per_lam"):
+            OUT_CV = OUT_TSV.parent / "ensemble_crossval.tsv"
+            with open(OUT_CV, "w", newline="", encoding="utf-8") as f:
+                w = csv.writer(f, delimiter="\t")
+                w.writerow(["lam", "n_folds", "in_sample_curated_frac",
+                            "heldout_curated_frac_mean", "heldout_curated_frac_sd",
+                            "heldout_curated_frac_pooled", "optimism",
+                            "n_models_min", "n_models_max"])
+                for r in crossval["per_lam"]:
+                    w.writerow([r["lam"], crossval["n_folds"],
+                                r.get("in_sample_curated_frac", ""),
+                                r["mean_curated_frac"], r["sd_curated_frac"],
+                                r["pooled_curated_frac"], r.get("optimism", ""),
+                                r["n_models_range"][0], r["n_models_range"][1]])
+            logger.info(f"wrote {OUT_CV.name}")
+
         summary = {
             "objective": "coverage_minus_lambda_quality_penalty",
             "target": target,
             "quality_column": quality_column,
             "pareto_lambdas": list(pareto_lambdas),
+            "crossval": crossval,
             "n_candidate_models": len(covered),
             "n_skipped_models": len(skipped),
             "total_gt_triples": total_gt,

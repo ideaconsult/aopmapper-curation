@@ -310,6 +310,35 @@ def _ensemble_summary(crossmodel: Path, variant: str, ensemble_mode: str = "gree
     # per-model contribution at the adopted point — the @tbl:pareto-models columns
     if summary.get("per_model_contribution"):
         out["per_model_contribution"] = summary["per_model_contribution"]
+    # k-fold cross-validation of the selection procedure (select_ensemble's crossval_folds).
+    # Every other coverage field above is RESUBSTITUTION — the objective maximises coverage
+    # of the curated triples and is then scored on those same triples — so the manuscript
+    # cannot quote recommended_kec_frac as a generalisation estimate without this beside it.
+    # Folds are over Key Events, and scoring is on held-out CURATED triples only.
+    if summary.get("crossval", {}).get("per_lam"):
+        cv = summary["crossval"]
+        out["crossval"] = {
+            "n_folds": cv.get("n_folds"),
+            "seed": cv.get("seed"),
+            "scored_on": cv.get("scored_on"),
+            "per_lam": [
+                {
+                    "lam": r.get("lam"),
+                    "in_sample_curated_frac": r.get("in_sample_curated_frac"),
+                    "mean_curated_frac": r.get("mean_curated_frac"),
+                    "sd_curated_frac": r.get("sd_curated_frac"),
+                    "pooled_curated_frac": r.get("pooled_curated_frac"),
+                    "optimism": r.get("optimism"),
+                    "n_models_range": r.get("n_models_range"),
+                }
+                for r in cv["per_lam"]
+            ],
+        }
+        # the adopted operating point's row, pulled out so prose can cite one number
+        knee = next((r for r in out["crossval"]["per_lam"]
+                     if r["lam"] == summary.get("knee_lam")), None)
+        if knee:
+            out["crossval_at_knee"] = knee
     return out
 
 

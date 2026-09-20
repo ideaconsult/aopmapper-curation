@@ -100,6 +100,13 @@ tasks:
       # prefer pareto_topsis/pareto_smaa, which set it themselves).
       pareto_lambdas: "{{pareto_lambdas}}"
       quality_column: "{{quality_column}}"
+      # "pareto*" modes only: k-fold cross-validation of the selection procedure over
+      # Key Events, turning the in-sample coverage figure into an out-of-sample estimate
+      # plus its optimism. 0 disables. See the task docstring for the leakage caveat on
+      # the quality term (and why the lam=0 row is the clean estimate).
+      crossval_folds: "{{crossval_folds}}"
+      crossval_seed: "{{crossval_seed}}"
+      crossval_lambdas: "{{crossval_lambdas}}"
 
 
   - source: tasks/usage_stats.py
