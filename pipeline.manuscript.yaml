@@ -44,6 +44,19 @@ tasks:
       smaa_variants: "{{kec_all_smaa_variants}}"
       figures: "{{kec_all_figures}}"
       n_top_models: 8
+      # Re-run kec_onto_recovery first if this file doesn't exist yet or is stale.
+      onto_recovery_json: "{{manuscript_repo}}/manuscript/generated/kec_onto_recovery.json"
+
+  - source: tasks/kec_onto_recovery.py
+    name: kec_onto_recovery
+    product:
+      nb:   "{{manuscript_repo}}/manuscript/generated/kec_onto_recovery.ipynb"
+      json: "{{manuscript_repo}}/manuscript/generated/kec_onto_recovery.json"
+    params:
+      products_dir: "{{kec_all_products_dir}}"
+      model_keys: "{{kec_all_models}}"
+      crossmodel_dir: "{{kec_all_crossmodel_dir}}"
+      min_support: 2
 
   - source: tasks/export_manuscript_results.py
     name: export_assays

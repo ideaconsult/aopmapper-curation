@@ -59,6 +59,9 @@ viz_assay_consensus_json = None  # optional: assay consensus clusters, for the p
 lineage_pairs = []             # optional: [{"a": model, "b": model, "relation": str}] -
                                 # same-checkpoint pairs whose triple-set Jaccard is reported
                                 # against the panel-wide pairwise distribution
+onto_recovery_json = None      # optional: tasks/kec_onto_recovery.py's output JSON - per-
+                                # ontology curated-triple recovery (true triple granularity,
+                                # not the cluster-level crossmodel_overview numbers)
 # -
 
 logger = setup_logging(Path(product["json"]).parent / "export_manuscript_results.log")
@@ -286,6 +289,10 @@ def _ensemble_summary(crossmodel: Path, variant: str, ensemble_mode: str = "gree
         "n_recommended_models": len(summary.get("recommended_models", [])),
         "n_candidate_models": summary.get("n_candidate_models"),
         "n_skipped_models": summary.get("n_skipped_models"),
+        # per-Key-Event coverage detail (title, n_gt, n_covered, covering_models,
+        # missed_ref_idx) — needed to regenerate which KEs are fully/partially/never
+        # covered, rather than hand-picking examples from the raw product file
+        "per_ke": summary.get("per_ke"),
         # run settings (smaa_link, smaa_topn, budget, ...) so each table row is traceable
         # to the configuration that produced it
         "params": summary.get("params"),
@@ -849,6 +856,9 @@ if enabled:
         out["smaa"] = smaa
         out["ensemble"] = ensemble
         out["figures"] = copied
+
+        if onto_recovery_json and Path(onto_recovery_json).exists():
+            out["onto_recovery"] = _load_json(Path(onto_recovery_json))
 
         # Assay-track only: evidence grounding / IRI validity are per-model, computed
         # against each model's own assays.json, not from crossmodel's consensus clusters
