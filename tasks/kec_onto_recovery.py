@@ -30,6 +30,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from tasks.figviz import onto_recovery_bar
 from tasks.kec_compare import Embedder, DEFAULT_TAU, DEFAULT_EMBEDDING_MODEL, triple_match
 from tasks.logutil import setup_logging
 
@@ -148,3 +149,12 @@ if enabled:
     with open(Path(product["json"]), "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2, ensure_ascii=False)
     logger.info(f"wrote {product['json']}")
+
+    # Written into crossmodel_dir/figures/, the same root export_manuscript_results.py's
+    # `figures:` param copies from for every other KEC_ALL figure (see kec_all_figures in
+    # env.manuscript.yaml) - so this figure is picked up the same way, not a special case.
+    figures_dir = Path(crossmodel_dir) / "figures"
+    for slot in ("process", "object"):
+        fig_out = figures_dir / f"fig_onto_recovery_{slot}.png"
+        onto_recovery_bar(out["by_slot_source"][slot], slot=slot, out_path=fig_out)
+        logger.info(f"wrote {fig_out}")

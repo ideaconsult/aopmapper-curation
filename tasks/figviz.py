@@ -249,6 +249,44 @@ def match_tiers(method_counts: dict, *, model: str, n_pred: int, n_matched: int,
     return {"out": str(out_path)}
 
 
+def onto_recovery_bar(by_source: dict, *, slot: str, out_path,
+                      caption: str | None = None):
+    """
+    Recovery rate of curated triples, grouped by the source ontology of one slot
+    (process or object). `by_source` = {source: {"total": n, "recovered": n, "rate": f}},
+    as written by tasks/kec_onto_recovery.py. One bar per ontology, sorted by total
+    count descending, labelled with recovered/total and coloured by rate.
+    """
+    sources = [s for s, b in by_source.items() if b.get("total")]
+    sources.sort(key=lambda s: -by_source[s]["total"])
+    rates = [by_source[s]["rate"] or 0.0 for s in sources]
+    totals = [by_source[s]["total"] for s in sources]
+    recovered = [by_source[s]["recovered"] for s in sources]
+
+    fig, ax = plt.subplots(figsize=(max(5, 0.8 * len(sources) + 2), 4.5))
+    cmap = plt.get_cmap("RdYlGn")
+    bars = ax.bar(sources, [r * 100 for r in rates],
+                  color=[cmap(r) for r in rates])
+    for bar, rec, tot in zip(bars, recovered, totals):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
+                f"{rec}/{tot}", ha="center", va="bottom", fontsize=8)
+    ax.set_ylabel("curated triples recovered (%)")
+    ax.set_ylim(0, 100)
+    ax.set_title(f"Recovery of curated triples by source ontology — {slot} slot")
+    if caption is None:
+        caption = (
+            "Recovery of curated KEC triples, grouped by the source ontology of the "
+            f"{slot} slot. A triple counts as recovered when a consensus cluster "
+            "(support >= min_support) matches it under the hybrid matcher.")
+    fig.text(0.5, -0.04, caption, ha="center", va="top", fontsize=7.5,
+             style="italic", wrap=True)
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    return {"out": str(out_path)}
+
+
 def ontology_usage_bar(ontologies: dict, *, out_path, top: int = 15,
                        caption: str | None = None):
     """
