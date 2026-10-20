@@ -1,0 +1,1384 @@
+{
+  "electrocardiogram": [
+    "ecg",
+    "ECG (Electrocardiogram)",
+    "electrocardiogram (ecg)",
+    "electrocardiography",
+    "electrocardiography (ecg)"
+  ],
+  "colony formation assay": [
+    "colony formation",
+    "colony-forming assay"
+  ],
+  "ames test": [
+    "ames assay"
+  ],
+  "brdu incorporation": [
+    "BrdU assay",
+    "brdu incorporation assay",
+    "BrdU incorporation staining",
+    "brdu labeling",
+    "brdu labelling",
+    "brdu or edu incorporation assay",
+    "BrdU staining"
+  ],
+  "cell counting": [
+    "cell count"
+  ],
+  "32P post-labeling": [
+    "32P Post labelling"
+  ],
+  "8-oxo-dG assay": [
+    "8-OHdG assay",
+    "8-hydroxydeoxyguanosine assay"
+  ],
+  "aCGH or SNP Microarray": [
+    "aCGH/SNP Microarray",
+    "Array Comparative Genomic Hybridization (aCGH) or SNP Microarray"
+  ],
+  "alkali-labile phosphoprotein assay": [
+    "alkali-labile phosphoprotein",
+    "alkali-labile phosphoprotein determination"
+  ],
+  "amh assay": [
+    "amh measurement"
+  ],
+  "amplex red assay": [
+    "Amplex Red Ultra assay",
+    "Amplex UltraRed fluorescent assay",
+    "amplexred assay"
+  ],
+  "amplex red reagent": [
+    "amplex red",
+    "amplexred"
+  ],
+  "amplex red ultra reagent": [
+    "amplex red ultra"
+  ],
+  "annexin v binding assay": [
+    "annexin v binding"
+  ],
+  "annexin v / pi apoptosis assay": [
+    "annexin-v pi staining"
+  ],
+  "atp assay": [
+    "atp assay kits",
+    "atp bioluminescent assay",
+    "atp content assay",
+    "atp detection assay"
+  ],
+  "bdnf measurement": [
+    "bdnf level measurement"
+  ],
+  "behavioral assay": [
+    "behavior test"
+  ],
+  "bioluminescence imaging": [
+    "bioluminescence imaging (bli)",
+    "bli"
+  ],
+  "boyden chamber assay": [
+    "boyden chamber"
+  ],
+  "caspase activity assay": [
+    "caspase activation assay",
+    "caspase colorimetric assay",
+    "caspase fluorescence assay"
+  ],
+  "cell viability assay": [
+    "cell survival assay"
+  ],
+  "cell death detection assay": [
+    "cell death detection elisa"
+  ],
+  "cell-based reporter assay": [
+    "cell-based reporter gene assay"
+  ],
+  "cfse labeling": [
+    "cfse",
+    "CFSE assay",
+    "CFSE proliferation assay",
+    "Cytoplasmic proliferation dye (CFSE)"
+  ],
+  "chip-seq": [
+    "chip sequencing"
+  ],
+  "chip-qpcr": [],
+  "chromatin immunoprecipitation": [
+    "chromatin immunoprecipitation (chip)"
+  ],
+  "colorimetric assay": [
+    "colourimetric dye assay"
+  ],
+  "colorimetric h2o2 assay": [
+    "Colorimetric H2O2 probe",
+    "colorimetric h2o2 probe assay"
+  ],
+  "computational models": [
+    "computational modeling"
+  ],
+  "coomassie blue G250 binding": [
+    "coomassie blue g250 binding method"
+  ],
+  "computed tomography": [
+    "ct",
+    "ct scan"
+  ],
+  "dcfda assay": [
+    "dcf assay",
+    "DCFH-DA assay",
+    "dcfhda",
+    "dichlorofluorescein assay"
+  ],
+  "dicentric chromosome assay": [
+    "dca",
+    "dca assay",
+    "Dicentric Chromosome Assay (DCA)"
+  ],
+  "dna microarray": [
+    "dna microarray analysis"
+  ],
+  "dynamic energy budget modeling": [
+    "dynamic energy budget model",
+    "deb model"
+  ],
+  "edu incorporation assay": [
+    "edu",
+    "EdU assay",
+    "edu incorporation"
+  ],
+  "electrophysiology": [
+    "electrophysiological measurements"
+  ],
+  "enzyme activity assay": [
+    "enzymatic activity assay",
+    "enzymatic analyses",
+    "enzymatic analysis",
+    "enzymatic assay",
+    "enzymatic assays",
+    "enzymatic method",
+    "enzyme activity determination",
+    "enzyme activity measurement",
+    "enzyme assay",
+    "enzyme assays"
+  ],
+  "epr": [
+    "epr spectroscopy",
+    "electron paramagnetic resonance",
+    "electron spin resonance"
+  ],
+  "evans blue uptake assay": [
+    "evans blue dye",
+    "evans blue / sulforhodamine b uptake"
+  ],
+  "extracellular recording": [
+    "extracellular field potential recording",
+    "Extracellular recording (unit recording)",
+    "Extracellular recordings"
+  ],
+  "evoked electrical activity measurement": [
+    "evoked electrical activity measurements"
+  ],
+  "fast-scan cyclic voltammetry": [
+    "fast-scan controlled-adsorption voltammetry"
+  ],
+  "fibrinogen assay": [
+    "fibrinogen",
+    "fibrinogen concentration assay"
+  ],
+  "fin measurement": [
+    "fin index"
+  ],
+  "fish": [
+    "fish/sky"
+  ],
+  "fitc-dextran permeability assay": [
+    "fitc-dextran assay"
+  ],
+  "fluorescence microscopy": [
+    "fluorescent microscopy"
+  ],
+  "fluorimetric analysis": [
+    "fluorometric procedure"
+  ],
+  "fluorescent dye uptake assay": [
+    "fluorescent dye transport assay"
+  ],
+  "fluoro-jade staining": [
+    "fluoro-jade c",
+    "fluoro-jade stain"
+  ],
+  "fluorescent calcium imaging": [
+    "fluorescent ca2+ imaging"
+  ],
+  "flow cytometry": [
+    "facs",
+    "facs-scan",
+    "flow cytometric method",
+    "flow cytometry biomarker assay",
+    "Flowcytometry",
+    "fluorescence-activated cell sorting"
+  ],
+  "gel mobility shift assay": [
+    "gel shift assay"
+  ],
+  "gene expression": [
+    "gene expression analysis",
+    "gene expression assay",
+    "gene expression profiling"
+  ],
+  "gfp": [
+    "gfp detection"
+  ],
+  "gfp reporter assay": [
+    "GFP assay",
+    "GFP assays",
+    "gfp expression assay",
+    "gfp fluorescence reporter assay",
+    "Green fluorescent protein reporter assay"
+  ],
+  "golgi staining": [
+    "golgi stain",
+    "golgi-cox staining",
+    "golgi-cox method"
+  ],
+  "gsh/gssg ratio assay": [
+    "gsh/gssg determination",
+    "gsh:gssg ratio assay"
+  ],
+  "hematoxylin and eosin staining": [
+    "Haematoxylin and eosin staining",
+    "hematoxylin and eosin (h&e) staining",
+    "hematoxylin-eosin (he) staining",
+    "Hematoxylin Eosin staining"
+  ],
+  "histology": [
+    "histochemical staining",
+    "histological staining",
+    "histological examination",
+    "histological exam",
+    "histological observation",
+    "histological assessment",
+    "histochemistry"
+  ],
+  "histopathology": [
+    "histopathologic examination",
+    "histopathological analysis",
+    "histopathological evaluation",
+    "histopathological examination",
+    "histopathological methods",
+    "histopathological observation"
+  ],
+  "Holter monitoring": [
+    "Holter monitor"
+  ],
+  "hormone level assay": [
+    "hormone level analysis"
+  ],
+  "hplc": [
+    "HPLC-based assay",
+    "hplc-based mapping"
+  ],
+  "hplc with fluorescence detection": [
+    "hplc with fluorescence detector",
+    "hplc with fluorometric detection",
+    "hplc/fluorescence",
+    "hplc-fld"
+  ],
+  "hplc with electrochemical detection": [
+    "hplc-ec",
+    "hplc-ecd"
+  ],
+  "hplc-mass spectrometry": [
+    "hplc-ms",
+    "hplc/ms-ms",
+    "hplc-esi-ms/ms",
+    "hplc-icp-mass spectrometry",
+    "hplc-uv/ms"
+  ],
+  "hyper probe": [
+    "hyper",
+    "hyper3"
+  ],
+  "intracranial pressure monitoring": [
+    "icp monitoring"
+  ],
+  "inductively coupled plasma mass spectrometry": [
+    "icpms",
+    "icp-ms"
+  ],
+  "indirect immunofluorescence assay": [
+    "iifa"
+  ],
+  "immunoassay": [
+    "immune based assay",
+    "immunological methods",
+    "immunological detection"
+  ],
+  "immunoblotting": [
+    "immunoblot",
+    "immunoblot analysis"
+  ],
+  "immunofluorescence": [
+    "immunofluorescence assay",
+    "immunofluorescence (if)",
+    "immunofluorescence microscopy",
+    "immunofluorescence/microscopy (h2ax/53bp1)",
+    "immunofluorescence staining",
+    "Immunofluorescent staining"
+  ],
+  "immunohistochemistry": [
+    "ihc",
+    "ihc/if",
+    "immunohistochemical methods",
+    "immunohistochemical stainin",
+    "Immunohistochemical staining",
+    "immunohistochemistry (ihc)"
+  ],
+  "immuno hybrid staining": [
+    "immunocyto/histochemistry",
+    "immunocytochemistry/immunohistochemistry",
+    "immunohistochemistry & immunofluorescence",
+    "immunohistocytological staining"
+  ],
+  "immunocytochemistry": [
+    "immunocytochemistry (th/dat/vmat2)"
+  ],
+  "immuno multiplex assay": [
+    "immunobead-based multiplex assay",
+    "immunocap"
+  ],
+  "intravital microscopy": [
+    "intravital microscopy (IVM)"
+  ],
+  "jaffe method": [
+    "jaffe reaction"
+  ],
+  "karyotype analysis": [
+    "karyotypical analysis"
+  ],
+  "ki-67 staining": [
+    "Ki-67 immunofluorescent staining",
+    "Ki-67 immunohistochemistry",
+    "ki-67 immunostaining",
+    "ki67",
+    "ki67 immunostaining"
+  ],
+  "kinase assay": [
+    "kinase activity assay",
+    "Kinase assays"
+  ],
+  "l-arginine to l-citrulline assay": [
+    "l-arginine to l-citrulline conversion",
+    "L-arginine to L-citrulline conversion assay"
+  ],
+  "ldh assay": [
+    "ldh activity assay",
+    "ldh cytotoxicity assay",
+    "ldh leakage assay",
+    "ldh release assay"
+  ],
+  "lipid peroxidation assay": [
+    "lipid peroxidation (lpo) assay"
+  ],
+  "luciferase reporter assay": [
+    "luciferase assay",
+    "luciferase reporter gene (lrg) assay",
+    "luciferase reporter gene assay"
+  ],
+  "lucigenin chemiluminescence": [
+    "lucigenin/coelenterazine chemiluminescence",
+    "lucigenin-enhanced chemiluminescence"
+  ],
+  "macroscopic assessment": [
+    "macroscopic examination"
+  ],
+  "masson's trichrome staining": [
+    "masson trichrome staining",
+    "masson trichrome"
+  ],
+  "matrigel invasion assay": [
+    "matrigel-based invasion assay"
+  ],
+  "metabolomics": [
+    "metabolomic approaches",
+    "metabolomics analysis"
+  ],
+  "microarray": [
+    "micro-array",
+    "microarray analysis",
+    "microarray profiling"
+  ],
+  "microelectrode array (mea)": [
+    "micro-electrode array (mea) recording",
+    "micro-electrode arrays",
+    "Microelectrode array (MEA) recordings"
+  ],
+  "microelectrode technique": [
+    "microelectrode studies"
+  ],
+  "microfluidic platform": [
+    "microfluidic assay",
+    "microfluidic devices"
+  ],
+  "microscopy": [
+    "light microscopy",
+    "microscope",
+    "microscopic examination",
+    "microscopy examination"
+  ],
+  "mitochondrial function/morphology assessment": [
+    "mitochondrial function assay",
+    "mitochondrial assessment",
+    "mitochondrial morphology assessment"
+  ],
+  "molecular docking": [
+    "molecular docking analysis",
+    "molecular modelling; docking simulation"
+  ],
+  "molecular modeling": [
+    "molecular modelling"
+  ],
+  "morphological analysis": [
+    "morphological examination"
+  ],
+  "morphometric analysis": [
+    "morphometric measurement",
+    "morphometrics",
+    "Morphometry"
+  ],
+  "morris water maze": [
+    "morris water maze (mwm)"
+  ],
+  "mri": [
+    "Magnetic resonance imaging",
+    "Magnetic Resonance Imaging (MRI)",
+    "mri scan"
+  ],
+  "mri or ct scans": [
+    "mri/ct scans"
+  ],
+  "mrna analysis": [
+    "mrna expression",
+    "mrna expression analysis",
+    "mrna measurement"
+  ],
+  "mrna and protein expression of meiotic markers": [
+    "mrna and protein level measurement"
+  ],
+  "mtt assay": [
+    "mtt",
+    "mtt/mts"
+  ],
+  "multiplex immunoassay": [
+    "multiplex bead assays",
+    "multiplex immunobead-based assay"
+  ],
+  "mutation frequency": [
+    "mutant frequency assay",
+    "mutation frequency analysis"
+  ],
+  "nad+/nadh ratio": [
+    "nadh/nad+ ratio imaging"
+  ],
+  "nadh formation assay": [
+    "nad reduction assay"
+  ],
+  "next generation sequencing (ngs)": [
+    "Next generation sequencing",
+    "ngs",
+    "ngs (wgs/wes)"
+  ],
+  "nitroblue tetrazolium assay": [
+    "nitroblue tetrazolium"
+  ],
+  "northern blot": [
+    "northern blotting"
+  ],
+  "novel object recognition": [
+    "novel object recognition (nor)"
+  ],
+  "nuclear signaling assay": [
+    "nuclear signaling activation/inhibition assay",
+    "Nuclear signaling assays"
+  ],
+  "optical coherence tomography": [
+    "optical coherence tomography (oct)"
+  ],
+  "oxygen consumption": [
+    "Cellular oxygen consumption",
+    "oxygen consumption (clark electrode)",
+    "oxygen consumption measurement"
+  ],
+  "oxygen evolution measurement": [
+    "oxygen evolution rate measurement"
+  ],
+  "patch clamp": [
+    "patch clamp electrophysiology",
+    "patch-clamp recording",
+    "Patch-Clamp Technique",
+    "patch-clamping"
+  ],
+  "pcr": [
+    "pcr assay",
+    "pcr quantification"
+  ],
+  "pcna staining": [
+    "pcna immunofluorescence",
+    "pcna immunohistochemistry",
+    "PCNA immunostaining"
+  ],
+  "positron emission tomography (pet)": [
+    "pet",
+    "pet imaging",
+    "pet scan",
+    "Positron emission tomography"
+  ],
+  "pet/computed tomography": [
+    "pet/ct"
+  ],
+  "pet/single photon emission computed tomography imaging": [
+    "pet/spect imaging"
+  ],
+  "pet-magnetic resonance imaging": [
+    "pet-mri"
+  ],
+  "ph sensitive dye imaging": [
+    "ph sensitive dye imaging",
+    "ph sensitive dyes distribution"
+  ],
+  "photometry": [
+    "photometric method",
+    "photographic measurement"
+  ],
+  "physical examination": [
+    "physical exam"
+  ],
+  "picro-sirius red staining": [
+    "picro-sirius red"
+  ],
+  "plaque assay": [
+    "plaque forming cell (pfc) assay"
+  ],
+  "ppar\u03b1 signaling assay": [
+    "pparalpha nuclear-receptor activation/inhibition assay",
+    "pparalpha signaling assay",
+    "ppar\u03b1 reporter gene assay"
+  ],
+  "precision cut lung slices": [
+    "precision cut lung slices (pcls)"
+  ],
+  "protein level analysis": [
+    "protein analysis",
+    "protein level",
+    "protein level measurement",
+    "protein level quantification"
+  ],
+  "proteomic analysis": [
+    "proteomic approach",
+    "proteomics"
+  ],
+  "proximity ligation assay": [
+    "proximity ligation assay (pla)"
+  ],
+  "qpcr": [
+    "q-pcr",
+    "qpcr",
+    "quantitative pcr",
+    "Quantitative PCR (qPCR)",
+    "Quantitative polymerase chain reaction (QPCR)"
+  ],
+  "qrt-pcr": [
+    "q-rt pcr",
+    "q-rtpcr",
+    "qrt-pcr",
+    "quantitative rt-pcr",
+    "quantitative real-time rt-pcr"
+  ],
+  "qsar model": [
+    "qsar models",
+    "qsar modelling"
+  ],
+  "radial arm maze": [
+    "radial maze"
+  ],
+  "radioimmunoassay": [
+    "radioimmunoassay (ria)",
+    "RIA (Radioimmunoassay)",
+    "\u0440\u0438\u0430"
+  ],
+  "radioligand binding assay": [
+    "radioligand binding",
+    "radioligand-binding assay (rlba)"
+  ],
+  "radiometric assay": [
+    "radiometric methods"
+  ],
+  "radioligand competition binding assay": [
+    "competitive binding assay",
+    "radioligand competition binding assay (mk801 site)"
+  ],
+  "rey osterieth complex figure (rcft)": [
+    "rey osterieth complex figure test (rcft)"
+  ],
+  "rna in situ hybridization": [
+    "rna in situ hybridization",
+    "RNA in situ hybridization (RNA-ISH)",
+    "rna-ish"
+  ],
+  "rna sequencing": [
+    "rna sequence analysis",
+    "rnaseq",
+    "rna-seq"
+  ],
+  "ros assay": [
+    "ros detection assay"
+  ],
+  "rt-pcr": [
+    "rt-pcr/rt-qpcr",
+    "RT-qPCR",
+    "rtpcr"
+  ],
+  "sandell-kolthoff method": [
+    "sandell-kolthoff reaction",
+    "sandell-kolthoff spectrophotometric assay"
+  ],
+  "sandwich elisa": [
+    "sandwich enzyme-linked immunoassay"
+  ],
+  "scratch wound assay": [
+    "scratch assay",
+    "scratch/wound healing assay"
+  ],
+  "seahorse xf analysis": [
+    "seahorse xf analyzer",
+    "seahorse xfp analyzer"
+  ],
+  "staged autobiographical memory task": [
+    "staged autobiographical memory (am) task"
+  ],
+  "stereomicroscopy": [
+    "stereomicroscope observation"
+  ],
+  "sucrose density gradient centrifugation": [
+    "sucrose density gradient centrifuge"
+  ],
+  "surface plasmon resonance": [
+    "spr",
+    "spr biosensor",
+    "Surface Plasmon Resonance (SPR)"
+  ],
+  "synaptogenesis assay": [
+    "synaptogenesis assay kits"
+  ],
+  "tba assay": [
+    "tba reactive substances assay",
+    "tbars",
+    "tbars assay"
+  ],
+  "transcriptomics": [
+    "transcription profiling",
+    "transcriptional analysis",
+    "Transcriptomic analyses",
+    "transcriptomic analysis",
+    "transcriptomic profiling"
+  ],
+  "trypan blue exclusion": [
+    "trypan blue exclusion assay",
+    "trypan blue exclusion test",
+    "trypan blue uptake"
+  ],
+  "tube formation": [
+    "tube formation assay"
+  ],
+  "uplc-ms": [
+    "UPLC-MS/MS",
+    "uplc-ms/ms screening",
+    "uplc\u2013ms/ms"
+  ],
+  "voltage-clamp": [
+    "voltage-clamp recordings"
+  ],
+  "western blot": [
+    "Immunoblotting (western blotting)",
+    "western blotting",
+    "Western blotting/immunoblotting",
+    "Western immunoblot",
+    "Western immunoblotting"
+  ],
+  "yeast estrogen screen (yes)": [
+    "yeast-based system",
+    "yes (yeast estrogen screen)"
+  ],
+  "\u03b3H2AX foci staining": [
+    "\u03b3-H2AX foci staining"
+  ],
+  "\u03b3H2AX assay": [
+    "\u03b3-H2AX",
+    "\u03b3H2AX",
+    "\u03b3H2AX analysis",
+    "\u03b3H2AX assay"
+  ],
+  "ELISA": [
+    "Enzyme-linked immunosorbent assay (ELISA)",
+    "immunoassay/ELISA"
+  ],
+  "Real-time PCR": [
+    "Real-time polymerase chain reaction",
+    "real-time quantitative PCR"
+  ],
+  "In situ hybridization": [
+    "In-situ hybridization (ISH)"
+  ],
+  "LC-MS/MS": [
+    "LC/MS",
+    "liquid chromatography/mass spectrometry",
+    "liquid chromatography mass spectrometry (LC\u2013MS)",
+    "Liquid chromatography-tandem mass spectrometry",
+    "liquid chromatography-tandem mass spectrometry (LC-MS/MS)"
+  ],
+  "Electron Microscopy": [
+    "light or electron microscopy"
+  ],
+  "TUNEL Assay": [
+    "TUNEL",
+    "TUNEL staining"
+  ],
+  "Comet assay": [
+    "modified comet assay",
+    "Neutral Comet Assay"
+  ],
+  "Enzyme immunoassay": [
+    "enzyme immunoassay (EIA)"
+  ],
+  "Confocal Microscopy": [
+    "confocal fluorescence microscopy"
+  ],
+  "Electrophoretic Mobility Shift Assay (EMSA)": [
+    "Electrophoretic mobility shift assay"
+  ],
+  "EEG": [
+    "EEG recording",
+    "electroencephalogram",
+    "Electroencephalogram (EEG)",
+    "electroencephalography",
+    "Electroencephalography (EEG)"
+  ],
+  "Time-lapse microscopy": [
+    "time-lapse imaging"
+  ],
+  "Microdialysis": [
+    "In vivo microdialysis"
+  ],
+  "Reporter assay": [
+    "Reporter Assays",
+    "Reporter gene assay"
+  ],
+  "Nuclear Magnetic Resonance": [
+    "NMR"
+  ],
+  "Quantitative nuclease protection assay (qNPA)": [
+    "quantitative nuclease protection assays (qNPA)"
+  ],
+  "Ultrasound": [
+    "ultrasonography",
+    "ultrasound examination",
+    "Ultrasound imaging"
+  ],
+  "Vaginal Smear Cytology": [
+    "Vaginal cytology"
+  ],
+  "Field Potential Recording": [
+    "extracellular field potential recordings",
+    "Local field potential recording"
+  ],
+  "GC-MS": [
+    "gas chromatography mass spectrometry (GC-MS)",
+    "GC/MS or LC/MS"
+  ],
+  "Mitochondrial membrane potential assay": [
+    "mitochondrial transmembrane potential measurement"
+  ],
+  "whole-cell patch clamp": [
+    "whole cell patch-clamp recording"
+  ],
+  "High content imaging": [
+    "High content image analysis"
+  ],
+  "T-cell proliferation assay": [
+    "T cell proliferation assays"
+  ],
+  "T47D-Kbluc assay": [
+    "T47D-Kbluc"
+  ],
+  "Transwell Migration Assay": [
+    "Transwell Invasion Assay"
+  ],
+  "Visual observation": [
+    "physical (visual) observation"
+  ],
+  "clinical examination": [
+    "clinical physical examination"
+  ],
+  "proteomic approaches": [
+    "proteomics analysis"
+  ],
+  "Children\u2019s Auditory Verbal Learning Test": [
+    "Children\u2019s Auditory Verbal Learning Test (CAVLT)"
+  ],
+  "Quantitative stereology": [
+    "stereology"
+  ],
+  "Surface plasmon resonance (SPR) biosensor assay": [
+    "surface plasmon resonance-based biosensor assay",
+    "Surface plasmon resonance biosensor assay",
+    "Surface plasmon resonance (SPR)-based biosensor",
+    "surface plasmon resonance (SPR)-based biosensor assay",
+    "Surface plasmon resonance (SPR) biosensor"
+  ],
+  "Transmission electron microscopy (TEM)": [
+    "Transmission electron microscopy"
+  ],
+  "Body weight measurement": [
+    "weight measurement",
+    "Whole body weight measurement"
+  ],
+  "Cytochrome c Reduction Assay": [
+    "Ferricytochrome c reduction assay"
+  ],
+  "FRET": [
+    "FRET assay",
+    "FRET spectroscopy"
+  ],
+  "Fluorescence in situ hybridization (FISH)": [
+    "Fluorescent In Situ Hybridization (FISH)"
+  ],
+  "Follicle counting": [
+    "Follicle counting (histological)"
+  ],
+  "Inflammatory cytokine arrays": [
+    "cytokine arrays"
+  ],
+  "Mass spectrometry-based proteomics": [
+    "Protein Mass Spectrometry"
+  ],
+  "NMDA receptor (MK801 site) radioligand competition binding assay": [
+    "NMDA receptor radioligand competition binding assay (MK801 site)"
+  ],
+  "Pancreatic enzyme activity assay": [
+    "pancreatic homogenate enzyme assay"
+  ],
+  "Promoter-reporter plasmid assay": [
+    "promoter-reporter assay"
+  ],
+  "RAR transactivation assay": [
+    "RAR reporter gene assay"
+  ],
+  "Serum Biomarkers": [
+    "Serum Biomarker Analysis"
+  ],
+  "T3 level measurement": [
+    "T3 measurement"
+  ],
+  "Two-photon Microscopy": [
+    "Two-photon intravital microscopy"
+  ],
+  "Videomicroscopy": [
+    "video microscopy"
+  ],
+  "[3H]thymidine incorporation": [
+    "3H-thymidine incorporation assay",
+    "[3H]-thymidine uptake"
+  ],
+  "cytokine bead array": [
+    "cytokine bead arrays",
+    "cytokine bead arrays / cytokine PCR arrays"
+  ],
+  "pancreatic exocrine secretion measurement": [
+    "pancreatic exocrine secretion assay"
+  ],
+  "radioligand competition binding assay ([3H]-CGP 39653)": [
+    "Radioligand competition binding assay using [3H]-CGP 39653"
+  ],
+  "zebrafish reporter assay": [
+    "zebrafish GFP reporter assay"
+  ],
+  "Chick chorioallantoic membrane assay": [
+    "Chick chorioallantoic membrane (CAM) vascularization assay",
+    "chorioallantoic membrane (CAM) assay"
+  ],
+  "Autoradiography": [
+    "Quantitative autoradiography"
+  ],
+  "CT Angiography": [
+    "computed tomography angiography"
+  ],
+  "Chemiluminescence": [
+    "Chemiluminescence analysis"
+  ],
+  "Estrogen Receptor Binding Assay": [
+    "ER binding assay"
+  ],
+  "FEV1 measurement": [
+    "FEV1"
+  ],
+  "Genome U34A Array": [
+    "Affymetrix Genome U34A Array"
+  ],
+  "Hematocrit test": [
+    "hematocrit"
+  ],
+  "Hydroxyapatite (HAP) binding assay": [
+    "Hydroxyapatite binding assay"
+  ],
+  "Immunofluorescence and microscopy": [
+    "immunofluorescent microscopy"
+  ],
+  "NBT reduction assay": [
+    "NBT assay"
+  ],
+  "Radioactive precursor incorporation": [
+    "Radioactive precursor incorporation assay"
+  ],
+  "Rat aortic explant assay": [
+    "rat fetal aortic explant assay"
+  ],
+  "Stra8 promoter-GFP reporter assay": [
+    "Stra8 promoter reporter assay"
+  ],
+  "Tox21_AR_BLA_Agonist_ratio": [
+    "TOX21 GR BLA Agonist Ratio"
+  ],
+  "fMRI": [
+    "Functional magnetic resonance imaging (fMRI)"
+  ],
+  "hyperinsulineamic euglycaemic clamp": [
+    "hyperinsulineamic euglycaemic clamp (HEC)"
+  ],
+  "reverse-phase HPLC": [
+    "Reverse-phase HPLC assay"
+  ],
+  "zebrafish embryotoxicity": [
+    "zebrafish embryotoxicity assay"
+  ],
+  "2D gel-electrophoresis and tandem mass spectrometry": [
+    "2D gel-electrophoresis with tandem mass spectrometry"
+  ],
+  "31P NMR spectroscopy": [
+    "^31P NMR spectroscopy"
+  ],
+  "6-hydroxychlorzoxazone/chlorzoxazone ratio": [
+    "6-hydroxychlorzoxazone/chlorzoxazone ratio assay"
+  ],
+  "8-oxo-dG ELISA": [
+    "ELISA for 8-oxodG"
+  ],
+  "AB/PAS staining": [
+    "PAS staining"
+  ],
+  "ALP assay": [
+    "ALP measurement"
+  ],
+  "AR Competitive Binding Assay": [
+    "Competitive AR Binding Assay"
+  ],
+  "AR Nuclear Translocation Assay": [
+    "Fluorescent AR Nuclear Translocation Assay"
+  ],
+  "AR Transactivation Assay": [
+    "AR activation assay"
+  ],
+  "ARE-Nrf2 Luciferase Assay": [
+    "Nrf2-ARE luciferase reporter assay"
+  ],
+  "Activity assays": [
+    "activity assay",
+    "enzymatic activity assays"
+  ],
+  "Alizarin red stain for calcium deposition": [
+    "Alizarin red staining"
+  ],
+  "Alkaline-labile phosphate assay": [
+    "alkaline-labile phosphate determination"
+  ],
+  "Annexin V affinity assay": [
+    "annexin V \u2013 affinity assay"
+  ],
+  "Behavioral audiometry": [
+    "Behavioral hearing test"
+  ],
+  "Bromodeoxyuridine (BrdU) labeling": [
+    "Bromodeoxyuridine (BrdU) labelling"
+  ],
+  "CASP1 Fluorescein Assay (FLICA)": [
+    "Caspase 1 FLICA Assay"
+  ],
+  "CD25 Phenotyping": [
+    "CD25 expression assay"
+  ],
+  "CRP assay": [
+    "CRP measurement"
+  ],
+  "Caspase 8 enzymatic activity assay": [
+    "Caspase 8 fluorogenic substrate assay"
+  ],
+  "Chitin synthase activity assay": [
+    "radioactive chitin synthase activity assay"
+  ],
+  "Chlorophyll fluorescence analysis": [
+    "chlorophyll a fluorescence"
+  ],
+  "Clark electrode oxygen consumption assay": [
+    "Oxygen consumption assay (Clark electrode)"
+  ],
+  "Co-localization pulse-chase": [
+    "Pulse-chase co-localization assay"
+  ],
+  "Coagulation parameters measurement": [
+    "coagulation parameter measurement"
+  ],
+  "Comet assay with Fpg and hOGG1": [
+    "Comet assay with Fpg and hOGG1 modifications"
+  ],
+  "Complex I Enzyme Activity (Colorimetric)": [
+    "colorimetric Complex I Enzyme Activity Assay",
+    "Complex I activity dipstick assay",
+    "Complex I Enzyme Activity Assay (Colorimetric)"
+  ],
+  "Computational Model": [
+    "in silico computational models"
+  ],
+  "Confocal Laser Scanning Microscopy": [
+    "Confocal laser scanning microscopy (CLSM)"
+  ],
+  "Cyp2E1 knockout mouse metabolite measurement": [
+    "Humanized Cyp2E1 mouse metabolite measurement"
+  ],
+  "Cytokine assay": [
+    "cytokine analysis",
+    "Cytokine measurement",
+    "Cytokine production assay"
+  ],
+  "D-AP5 evoked electrical activity measurement": [
+    "Evoked electrical activity measurements using D-AP5"
+  ],
+  "D-dimer concentration assay": [
+    "D-dimer measurement"
+  ],
+  "DAF-2 DA fluorescence": [
+    "DAF-2 DA fluorescent indicator",
+    "DAF-2 DA fluorescent signal detection"
+  ],
+  "DAPI": [
+    "DAPI Staining"
+  ],
+  "DTNB assay": [
+    "spectrophotometry (DTNB)"
+  ],
+  "Direct quantification of L-Glu transporter activity (Radioligand uptake)": [
+    "L-Glu transporter uptake assay"
+  ],
+  "Diverse Mobility assay": [
+    "Diverse Mobility assays"
+  ],
+  "EPR (electron paramagnetic resonance spectroscopy)": [
+    "Electron Paramagnetic Resonance (EPR)"
+  ],
+  "Electric Cell-Substrate Impedance Sensing": [
+    "Electric Cell-Substrate Impedance Sensing (ECIS)"
+  ],
+  "Endo H digestion": [
+    "endo H digestion analysis"
+  ],
+  "Ex vivo NMR and targeted metabolomics": [
+    "Ex vivo NMR with metabolomic profiling"
+  ],
+  "Extracellular flux analysis": [
+    "extracellular flux analyzer assay"
+  ],
+  "FLU-TTR": [
+    "FLU-TTR assay"
+  ],
+  "Fatty Acid Beta Oxidation Assay": [
+    "Mitochondrial fatty acid beta oxidation assay",
+    "Radio-labeled fatty acid beta oxidation assay"
+  ],
+  "Flow Cytometry with DCFH-DA": [
+    "flow cytometry (DCFH-DA)"
+  ],
+  "Flow Cytometry with Dih123": [
+    "flow cytometry (Dih123)"
+  ],
+  "Flow cytometry with HLA-DQ\u2013gluten tetramers": [
+    "HLA-DQ\u2013gluten tetramer flow cytometry"
+  ],
+  "Fluo3 AM fluorescence imaging": [
+    "Fluo3 AM imaging"
+  ],
+  "Fluorescence Correlation Spectroscopy": [
+    "Fluorescence Correlation Spectroscopy (FCS)"
+  ],
+  "Fluorescent binding assay": [
+    "fluorescence binding assay",
+    "fluorescence binding assays"
+  ],
+  "Fluorescent displacement assay (FLU-TTR)": [
+    "fluorescence displacement assay (FLU-TTR)"
+  ],
+  "Fluorometric assay for enzyme kinetics": [
+    "fluorometric enzyme kinetics assay"
+  ],
+  "Forepaw Stride length": [
+    "Forepaw stride length test"
+  ],
+  "GSH depletion assay": [
+    "glutathione depletion assay"
+  ],
+  "GSH/GSSG Ratio Detection Assay": [
+    "GSH:GSSG ratio detection assay"
+  ],
+  "HOMA-IR": [
+    "Homeostatic Model for Insulin Resistance (HOMA-IR)"
+  ],
+  "HPLC with UV-detection": [
+    "HPLC-UV"
+  ],
+  "Hemagglutination assay (HAI)": [
+    "hemagglutination assay",
+    "hemagglutination inhibition (HAI) assay"
+  ],
+  "Hershberger Bioassay": [
+    "Hershberger Bioassay in Rats"
+  ],
+  "I-O curve (input-output curve)": [
+    "I-O curve measurement"
+  ],
+  "Imaging procedures": [
+    "imaging techniques"
+  ],
+  "Immunofluorescent staining for \u03b1-SMA": [
+    "\u03b1-SMA immunohistochemistry"
+  ],
+  "In silico NMDA receptor targeting prediction": [
+    "NMDA receptor targeting prediction"
+  ],
+  "In vitro assessment of gluconeogenic capacity": [
+    "in vitro gluconeogenic capacity assay"
+  ],
+  "In vivo zebrafish endothelial reporter assay": [
+    "Transgenic endothelial reporter zebrafish assay"
+  ],
+  "Inductively coupled plasma mass spectrometry (ICP-MS)": [
+    "Inductively coupled plasma mass spectrometry (ICPMS)"
+  ],
+  "KeratinoSens": [
+    "KeratinoSens\u2122"
+  ],
+  "Ki67 assay": [
+    "Ki67 probe"
+  ],
+  "LC-ICP-MS": [
+    "LC-inductively coupled plasma\u2013mass spectrometry"
+  ],
+  "LTP induction": [
+    "Long-term potentiation (LTP) induction"
+  ],
+  "Lucifer Yellow (LY) leakage assay": [
+    "Lucifer Yellow leakage assay"
+  ],
+  "Luciferin-luciferase assay": [
+    "Luminometric luciferase/luciferin assay"
+  ],
+  "LysoTracker Red staining": [
+    "Lysotracker green staining"
+  ],
+  "MMP activity assay": [
+    "MMP assay"
+  ],
+  "MSD electrochemiluminescent immunoassay": [
+    "MSD multiplex electrochemiluminescent immunoassay"
+  ],
+  "MTT assay for SDH activity": [
+    "SDH activity assay (MTT/PMS)"
+  ],
+  "Matrigel assay": [
+    "Matrigel plug assay"
+  ],
+  "Micronuclei (MN) Assay via Microscopy": [
+    "micronuclei assay",
+    "Micronucleus assay",
+    "Micronucleus Assay by Microscopy in vivo",
+    "Micronucleus (MN) microscopy"
+  ],
+  "NMR analysis": [
+    "NMR studies"
+  ],
+  "NVS_IC_rNaCh_site 2": [
+    "NVS_IC_rNaCh_site2"
+  ],
+  "Neutral red uptake": [
+    "Neutral red uptake assay"
+  ],
+  "PPAR\u03b3 (mouse/rat) Reporter Assay Kit": [
+    "PPAR\u03b3 reporter assay kit"
+  ],
+  "PPAR\u03b3 antagonism assay": [
+    "PPAR\u03b3 antagonist assay"
+  ],
+  "Permeability Assays": [
+    "membrane permeability assay",
+    "Permeability assay"
+  ],
+  "Pharmacologic inhibitor assay": [
+    "Pharmacological inhibition assay"
+  ],
+  "Pollen load assessment": [
+    "Pollen load scoring"
+  ],
+  "Promoter-reporter plasmid assay (human M-CPT I)": [
+    "promoter-reporter assay for M-CPT I"
+  ],
+  "Protein carbonyl assays": [
+    "protein carbonyl content assay"
+  ],
+  "Prothrombin time (PT)": [
+    "prothrombin time",
+    "Prothrombin time measurement"
+  ],
+  "Quantitative Real-Time PCR (qRT-PCR)": [
+    "quantitative real-time PCR",
+    "Quantitative reverse transcription PCR (qRT-PCR)",
+    "quantitative reverse transcription polymerase chain reaction (qRT-PCR)"
+  ],
+  "RAR-RXR-RARE reporter assay": [
+    "RAR-RXR-RARE/RXR-RXR-RARE reporter assay"
+  ],
+  "ROS production assay": [
+    "intracellular ROS assay"
+  ],
+  "RT-PCR / qPCR": [
+    "qPCR and RT-PCR",
+    "quantitative reverse transcription-polymerase chain reaction (RT-PCR)"
+  ],
+  "Radioiodide uptake assay": [
+    "radioactive iodine uptake test"
+  ],
+  "Respirometer-metabolism chamber": [
+    "respirometer metabolism chambers"
+  ],
+  "Rey Osterieth Complex Figure Test": [
+    "Rey Osterrieth Complex Figure Test"
+  ],
+  "Serial sectioning with stereo microscopy": [
+    "Serial sectioning with stereo microscopy, imaging, morphometric analysis"
+  ],
+  "Serum estrogen analysis": [
+    "estrogen serum levels"
+  ],
+  "Serum \u03b2-hydroxybutyrate measurement": [
+    "blood serum \u03b2-hydroxybutyrate measurement"
+  ],
+  "Smith-modified Kernahan 'Y' classification": [
+    "revised Smith-modified Kernahan \u2018Y\u2019 classification"
+  ],
+  "Stereomicroscopy for anterior swim bladder inflation": [
+    "Stereomicroscopy for swim bladder inflation"
+  ],
+  "TH immunocytochemistry": [
+    "immunocytochemistry for TH"
+  ],
+  "Thymidine incorporation": [
+    "thymidine analogue incorporation"
+  ],
+  "Thymidine kinase gene mutation test": [
+    "thymidine kinase gene mutation assay"
+  ],
+  "Trans-Endothelial Electrical Resistance (TEER)": [
+    "Transepithelial electrical resistance (TEER)"
+  ],
+  "UPLC-MS competitive binding assay": [
+    "isotope-free competitive binding assay with UPLC-MS"
+  ],
+  "UROD enzyme assay": [
+    "UROD enzyme assay with HPLC"
+  ],
+  "Urine test strips (reflectometry)": [
+    "Urine test strips with reflectometry"
+  ],
+  "Visual assessment of vaginal opening": [
+    "vaginal opening assessment"
+  ],
+  "Wechsler Memory Scale Logical Memory Test": [
+    "Wechsler Memory Scale Logical Memory Test Battery"
+  ],
+  "area analysis of heart and edema": [
+    "area analysis of heart/edema"
+  ],
+  "cytogenetic assay": [
+    "cytogenetic assays"
+  ],
+  "direct observation of phenotypic secondary sex characteristics": [
+    "phenotypic secondary sex characteristic observation"
+  ],
+  "fecal egestion": [
+    "fecal egestion measurement"
+  ],
+  "guaiacol oxidation assay": [
+    "guaiacol oxidation kinetic assay"
+  ],
+  "heart rate measurement": [
+    "heartbeat rate measurement"
+  ],
+  "high performance liquid chromatography (HPLC)": [
+    "high-performance liquid chromatography"
+  ],
+  "histological analysis": [
+    "histological section analysis",
+    "qualitative histological assessment"
+  ],
+  "immunophenotypic analyses": [
+    "immunophenotyping"
+  ],
+  "immunoprecipitation-HPLC": [
+    "immunoprecipitation-HPLC assay"
+  ],
+  "in vivo complex enzyme assay (ICE)": [
+    "in vivo complex of enzyme (ICE) assay"
+  ],
+  "intracellular electrode recording": [
+    "intracellular recordings"
+  ],
+  "nasal potential difference": [
+    "nasal potential difference (NPD)"
+  ],
+  "non-contrasted head CT": [
+    "non-contrasted head computed tomogram (CT)"
+  ],
+  "nuclear receptor reporter assay": [
+    "nuclear receptor reporter assays"
+  ],
+  "organ breakdown product analysis": [
+    "organ breakdown product examination"
+  ],
+  "ovarian tissue explant assay": [
+    "ovarian tissue explant steroidogenesis assay"
+  ],
+  "para-nitrophenol oxidation": [
+    "para-nitrophenol oxidation assay"
+  ],
+  "puromycin incorporation": [
+    "puromycin incorporation assay"
+  ],
+  "radiolabel incorporation": [
+    "radiolabeled tracer incorporation"
+  ],
+  "stereological cell counting": [
+    "stereological cell counts"
+  ],
+  "stomach content analysis": [
+    "stomach contents analysis"
+  ],
+  "\u03b3-H2AX Foci Quantification - Flow Cytometry": [
+    "\u03b3-H2AX foci assay"
+  ]
+}

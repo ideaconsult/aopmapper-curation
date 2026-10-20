@@ -1,0 +1,66 @@
+executor: serial
+
+meta:
+    extract_upstream: False
+
+tasks:
+  - source: tasks/get_xsd.py
+    product: 
+      nb: "{{products}}/get_xsd.ipynb"
+      xsd: "{{products}}/aop.xsd"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version}}"
+
+  - source: tasks/parse_pydantic.py
+    upstream: ["get_xsd"]  
+    product:
+      nb: "{{products}}/parse_pydantic.ipynb"
+      json: "{{products}}/aop.json"
+    params:
+      aop_xml: "{{aop_xml}}"
+      version: "{{version}}"
+
+  # Maintains resources/assay_synonyms.json from the consensus clusters (no Solr input, so no
+  # circularity); assay_consensus2solr reads its product. Logs a WARNING if the map changes.
+  - source: tasks/assay_synonyms_update.py
+    upstream: ["ke_graph"]
+    product:
+      nb: "{{products}}/assay_synonyms_update.ipynb"
+      synonyms: "resources/assay_synonyms.json"
+      applied: "resources/assay_synonyms_applied.tsv"
+      stats: "{{products}}/assay_synonyms_update.json"
+    params:
+      viz_assay_consensus_json: "{{assays_products}}/crossmodel/{{assays_crossmodel}}/viz_assay_consensus.json"
+      assay_min_support: "{{assay_min_support}}"
+      assay_synonym_threshold: "{{assay_synonym_threshold}}"
+      assay_synonym_veto: "{{assay_synonym_veto}}"
+      embedding_model: "{{assay_synonym_embedding_model}}"
+
+  # Structured Methods2AOP assay docs (assay_technique + ke_assay) from the assay
+  # pipeline's cross-model consensus. Replaces the old name-only tasks/assay2solr.py.
+  # Its synonym map is the product of assay_synonyms_update (the param is the fallback).
+  - source: tasks/assay_consensus2solr.py
+    upstream: ["ke_graph", "assay_synonyms_update"]
+    product:
+      nb: "{{products}}/assay_consensus2solr.ipynb"
+      json: "{{products}}/solr/aop_solr_assay.json"
+      assays_ke_cleaned: "{{products}}/solr/mmt_assays_cleaned.json"
+      # technique-vs-record counts + most-reused techniques; the only place the two
+      # exist together (name consolidation happens here), so the manuscript cites it
+      stats: "{{products}}/solr/assay_technique_stats.json"
+    params:
+      viz_assay_consensus_json: "{{assays_products}}/crossmodel/{{assays_crossmodel}}/viz_assay_consensus.json"
+      assays_products: "{{assays_products}}"
+      assay_min_support: "{{assay_min_support}}"
+      assay_synonyms: "resources/assay_synonyms.json"
+      iri_min_freq: 2
+
+  - source: tasks/ke_graph.py
+    upstream: ["parse_pydantic"]    
+    product:
+      nb: "{{products}}/ke_graph.ipynb"
+      data: "{{products}}/ke_links.json"
+      lookup: "{{products}}/lookup.json"
+    params:
+      version: "{{version}}"

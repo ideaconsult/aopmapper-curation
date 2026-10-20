@@ -1,0 +1,317 @@
+variant	canonical	sim	risky
+Western immunoblot	western blot	0.9114	1
+Western blotting/immunoblotting	western blot	0.9109	0
+Western immunoblotting	western blot	0.9053	1
+Immunoblotting (western blotting)	western blot	0.9023	0
+immunohistochemical methods	immunohistochemistry	0.9325	0
+Immunohistochemical staining	immunohistochemistry	0.9304	0
+flow cytometric method	flow cytometry	0.9612	0
+Flowcytometry	flow cytometry	0.9215	0
+Quantitative PCR (qPCR)	qpcr	0.9352	1
+Quantitative polymerase chain reaction (QPCR)	qpcr	0.918	1
+RT-qPCR	rt-pcr	0.9103	1
+histopathologic examination	histopathology	0.9116	0
+HPLC-based assay	hplc	0.9096	0
+RIA (Radioimmunoassay)	radioimmunoassay	0.9557	1
+Patch-Clamp Technique	patch clamp	0.9405	0
+immunoblot analysis	immunoblotting	0.9166	0
+BrdU incorporation staining	brdu incorporation	0.936	0
+BrdU assay	brdu incorporation	0.9047	0
+BrdU staining	brdu incorporation	0.9018	0
+Hematoxylin Eosin staining	hematoxylin and eosin staining	0.9769	0
+Haematoxylin and eosin staining	hematoxylin and eosin staining	0.969	0
+Magnetic Resonance Imaging (MRI)	mri	0.9476	0
+Magnetic resonance imaging	mri	0.9452	1
+Microelectrode array (MEA) recordings	microelectrode array (mea)	0.9519	0
+metabolomic approaches	metabolomics	0.9461	0
+Transcriptomic analyses	transcriptomics	0.9477	0
+Ki-67 immunofluorescent staining	ki-67 staining	0.9402	0
+Ki-67 immunohistochemistry	ki-67 staining	0.9392	0
+Nuclear signaling assays	nuclear signaling assay	0.9909	0
+PCNA immunostaining	pcna staining	0.9528	0
+Surface Plasmon Resonance (SPR)	surface plasmon resonance	0.9498	1
+UPLC-MS/MS	uplc-ms	0.9793	0
+scratch assay	scratch wound assay	0.9483	1
+Next generation sequencing	next generation sequencing (ngs)	0.9487	1
+protein analysis	protein level analysis	0.9593	0
+protein level quantification	protein level analysis	0.9022	0
+Amplex Red Ultra assay	amplex red assay	0.9746	1
+Amplex UltraRed fluorescent assay	amplex red assay	0.9199	1
+CFSE assay	cfse labeling	0.938	0
+CFSE proliferation assay	cfse labeling	0.9278	0
+Cytoplasmic proliferation dye (CFSE)	cfse labeling	0.9086	1
+DCFH-DA assay	dcfda assay	0.9325	1
+Dicentric Chromosome Assay (DCA)	dicentric chromosome assay	0.9178	1
+GFP assay	gfp reporter assay	0.9371	0
+GFP assays	gfp reporter assay	0.9369	0
+Green fluorescent protein reporter assay	gfp reporter assay	0.9006	1
+Kinase assays	kinase assay	0.9928	0
+oxygen consumption measurement	oxygen consumption	0.956	0
+Cellular oxygen consumption	oxygen consumption	0.9079	0
+RNA in situ hybridization (RNA-ISH)	rna in situ hybridization	0.9354	1
+Array Comparative Genomic Hybridization (aCGH) or SNP Microarray	aCGH or SNP Microarray	0.9395	1
+Extracellular recordings	extracellular recording	0.9856	0
+Extracellular recording (unit recording)	extracellular recording	0.9042	1
+molecular modelling; docking simulation	molecular docking	0.9151	0
+competitive binding assay	radioligand competition binding assay	0.9002	0
+γH2AX analysis	γH2AX assay	0.979	0
+Enzyme-linked immunosorbent assay (ELISA)	ELISA	0.9196	1
+immunoassay/ELISA	ELISA	0.9022	0
+Real-time polymerase chain reaction	Real-time PCR	0.9355	1
+real-time quantitative PCR	Real-time PCR	0.9237	0
+In-situ hybridization (ISH)	In situ hybridization	0.9261	1
+LC/MS	LC-MS/MS	0.9619	0
+liquid chromatography mass spectrometry (LC–MS)	LC-MS/MS	0.9358	1
+liquid chromatography-tandem mass spectrometry (LC-MS/MS)	LC-MS/MS	0.9333	1
+Liquid chromatography-tandem mass spectrometry	LC-MS/MS	0.9097	1
+liquid chromatography/mass spectrometry	LC-MS/MS	0.906	1
+light or electron microscopy	Electron Microscopy	0.9066	1
+TUNEL staining	TUNEL Assay	0.9555	0
+TUNEL	TUNEL Assay	0.954	0
+modified comet assay	Comet assay	0.9496	0
+Neutral Comet Assay	Comet assay	0.9311	0
+enzyme immunoassay (EIA)	Enzyme immunoassay	0.9162	1
+confocal fluorescence microscopy	Confocal Microscopy	0.9001	0
+Electrophoretic mobility shift assay	Electrophoretic Mobility Shift Assay (EMSA)	0.9419	1
+Electroencephalography (EEG)	EEG	0.9531	0
+electroencephalography	EEG	0.9505	1
+Electroencephalogram (EEG)	EEG	0.9499	0
+electroencephalogram	EEG	0.945	1
+EEG recording	EEG	0.9099	0
+time-lapse imaging	Time-lapse microscopy	0.9454	0
+In vivo microdialysis	Microdialysis	0.9349	1
+Reporter Assays	Reporter assay	0.9867	0
+Reporter gene assay	Reporter assay	0.9386	1
+NMR	Nuclear Magnetic Resonance	0.9031	1
+quantitative nuclease protection assays (qNPA)	Quantitative nuclease protection assay (qNPA)	0.9959	0
+ultrasound examination	Ultrasound	0.9623	0
+Ultrasound imaging	Ultrasound	0.9543	0
+ultrasonography	Ultrasound	0.9462	0
+Vaginal cytology	Vaginal Smear Cytology	0.9403	1
+Local field potential recording	Field Potential Recording	0.92	1
+extracellular field potential recordings	Field Potential Recording	0.9199	0
+gas chromatography mass spectrometry (GC-MS)	GC-MS	0.9392	1
+GC/MS or LC/MS	GC-MS	0.9185	1
+mitochondrial transmembrane potential measurement	Mitochondrial membrane potential assay	0.9131	0
+whole cell patch-clamp recording	whole-cell patch clamp	0.9568	0
+High content image analysis	High content imaging	0.9023	1
+T cell proliferation assays	T-cell proliferation assay	0.9909	0
+T47D-Kbluc	T47D-Kbluc assay	0.9216	0
+Transwell Invasion Assay	Transwell Migration Assay	0.9062	0
+physical (visual) observation	Visual observation	0.9263	0
+clinical physical examination	clinical examination	0.917	0
+proteomics analysis	proteomic approaches	0.9307	0
+Children’s Auditory Verbal Learning Test (CAVLT)	Children’s Auditory Verbal Learning Test	0.9116	1
+stereology	Quantitative stereology	0.9452	0
+surface plasmon resonance (SPR)-based biosensor assay	Surface plasmon resonance (SPR) biosensor assay	0.9935	0
+Surface plasmon resonance biosensor assay	Surface plasmon resonance (SPR) biosensor assay	0.9737	1
+surface plasmon resonance-based biosensor assay	Surface plasmon resonance (SPR) biosensor assay	0.9627	1
+Surface plasmon resonance (SPR) biosensor	Surface plasmon resonance (SPR) biosensor assay	0.9565	0
+Surface plasmon resonance (SPR)-based biosensor	Surface plasmon resonance (SPR) biosensor assay	0.9487	0
+Transmission electron microscopy	Transmission electron microscopy (TEM)	0.951	1
+weight measurement	Body weight measurement	0.9374	1
+Whole body weight measurement	Body weight measurement	0.9274	1
+Ferricytochrome c reduction assay	Cytochrome c Reduction Assay	0.9006	0
+FRET assay	FRET	0.9062	0
+FRET spectroscopy	FRET	0.9017	0
+Fluorescent In Situ Hybridization (FISH)	Fluorescence in situ hybridization (FISH)	0.9946	0
+Follicle counting (histological)	Follicle counting	0.9096	0
+cytokine arrays	Inflammatory cytokine arrays	0.9351	0
+Protein Mass Spectrometry	Mass spectrometry-based proteomics	0.9077	0
+NMDA receptor radioligand competition binding assay (MK801 site)	NMDA receptor (MK801 site) radioligand competition binding assay	0.9122	0
+pancreatic homogenate enzyme assay	Pancreatic enzyme activity assay	0.9174	0
+promoter-reporter assay	Promoter-reporter plasmid assay	0.9537	0
+RAR reporter gene assay	RAR transactivation assay	0.9044	1
+Serum Biomarker Analysis	Serum Biomarkers	0.9096	0
+T3 measurement	T3 level measurement	0.9876	0
+Two-photon intravital microscopy	Two-photon Microscopy	0.9141	0
+video microscopy	Videomicroscopy	0.9189	0
+[3H]-thymidine uptake	[3H]thymidine incorporation	0.9457	1
+3H-thymidine incorporation assay	[3H]thymidine incorporation	0.931	0
+cytokine bead arrays	cytokine bead array	0.9785	0
+cytokine bead arrays / cytokine PCR arrays	cytokine bead array	0.9266	1
+pancreatic exocrine secretion assay	pancreatic exocrine secretion measurement	0.9488	0
+Radioligand competition binding assay using [3H]-CGP 39653	radioligand competition binding assay ([3H]-CGP 39653)	0.9547	0
+zebrafish GFP reporter assay	zebrafish reporter assay	0.9242	1
+Chick chorioallantoic membrane (CAM) vascularization assay	Chick chorioallantoic membrane assay	0.9178	1
+chorioallantoic membrane (CAM) assay	Chick chorioallantoic membrane assay	0.9157	1
+Quantitative autoradiography	Autoradiography	0.9207	0
+computed tomography angiography	CT Angiography	0.98	1
+Chemiluminescence analysis	Chemiluminescence	0.9418	0
+ER binding assay	Estrogen Receptor Binding Assay	0.9077	1
+FEV1	FEV1 measurement	0.9766	0
+Affymetrix Genome U34A Array	Genome U34A Array	0.9437	0
+hematocrit	Hematocrit test	0.9506	0
+Hydroxyapatite binding assay	Hydroxyapatite (HAP) binding assay	0.9663	1
+immunofluorescent microscopy	Immunofluorescence and microscopy	0.9493	0
+NBT assay	NBT reduction assay	0.9226	0
+Radioactive precursor incorporation assay	Radioactive precursor incorporation	0.9118	0
+rat fetal aortic explant assay	Rat aortic explant assay	0.9436	1
+Stra8 promoter reporter assay	Stra8 promoter-GFP reporter assay	0.9533	1
+TOX21 GR BLA Agonist Ratio	Tox21_AR_BLA_Agonist_ratio	0.9596	1
+Functional magnetic resonance imaging (fMRI)	fMRI	0.9329	0
+hyperinsulineamic euglycaemic clamp (HEC)	hyperinsulineamic euglycaemic clamp	0.9209	1
+Reverse-phase HPLC assay	reverse-phase HPLC	0.9645	0
+zebrafish embryotoxicity assay	zebrafish embryotoxicity	0.9078	0
+2D gel-electrophoresis with tandem mass spectrometry	2D gel-electrophoresis and tandem mass spectrometry	0.9847	0
+^31P NMR spectroscopy	31P NMR spectroscopy	0.9865	1
+6-hydroxychlorzoxazone/chlorzoxazone ratio assay	6-hydroxychlorzoxazone/chlorzoxazone ratio	0.9698	0
+ELISA for 8-oxodG	8-oxo-dG ELISA	0.9328	1
+PAS staining	AB/PAS staining	0.9001	1
+ALP measurement	ALP assay	0.9571	0
+Competitive AR Binding Assay	AR Competitive Binding Assay	0.9869	0
+Fluorescent AR Nuclear Translocation Assay	AR Nuclear Translocation Assay	0.9007	0
+AR activation assay	AR Transactivation Assay	0.9325	0
+Nrf2-ARE luciferase reporter assay	ARE-Nrf2 Luciferase Assay	0.9738	0
+activity assay	Activity assays	0.9956	0
+enzymatic activity assays	Activity assays	0.9333	0
+Alizarin red staining	Alizarin red stain for calcium deposition	0.942	0
+alkaline-labile phosphate determination	Alkaline-labile phosphate assay	0.9809	0
+annexin V – affinity assay	Annexin V affinity assay	0.9949	0
+Behavioral hearing test	Behavioral audiometry	0.9005	0
+Bromodeoxyuridine (BrdU) labelling	Bromodeoxyuridine (BrdU) labeling	0.9959	0
+Caspase 1 FLICA Assay	CASP1 Fluorescein Assay (FLICA)	0.9334	1
+CD25 expression assay	CD25 Phenotyping	0.9031	0
+CRP measurement	CRP assay	0.9662	0
+Caspase 8 fluorogenic substrate assay	Caspase 8 enzymatic activity assay	0.9185	0
+radioactive chitin synthase activity assay	Chitin synthase activity assay	0.9061	0
+chlorophyll a fluorescence	Chlorophyll fluorescence analysis	0.9059	1
+Oxygen consumption assay (Clark electrode)	Clark electrode oxygen consumption assay	0.9613	0
+Pulse-chase co-localization assay	Co-localization pulse-chase	0.947	0
+coagulation parameter measurement	Coagulation parameters measurement	0.9931	0
+Comet assay with Fpg and hOGG1 modifications	Comet assay with Fpg and hOGG1	0.9694	0
+Complex I Enzyme Activity Assay (Colorimetric)	Complex I Enzyme Activity (Colorimetric)	0.9913	0
+colorimetric Complex I Enzyme Activity Assay	Complex I Enzyme Activity (Colorimetric)	0.9771	0
+Complex I activity dipstick assay	Complex I Enzyme Activity (Colorimetric)	0.9133	1
+in silico computational models	Computational Model	0.9003	1
+Confocal laser scanning microscopy (CLSM)	Confocal Laser Scanning Microscopy	0.9221	1
+Humanized Cyp2E1 mouse metabolite measurement	Cyp2E1 knockout mouse metabolite measurement	0.9176	0
+cytokine analysis	Cytokine assay	0.9627	0
+Cytokine measurement	Cytokine assay	0.9463	0
+Cytokine production assay	Cytokine assay	0.9349	0
+Evoked electrical activity measurements using D-AP5	D-AP5 evoked electrical activity measurement	0.9595	0
+D-dimer measurement	D-dimer concentration assay	0.958	0
+DAF-2 DA fluorescent indicator	DAF-2 DA fluorescence	0.9558	0
+DAF-2 DA fluorescent signal detection	DAF-2 DA fluorescence	0.9519	1
+DAPI Staining	DAPI	0.9069	0
+spectrophotometry (DTNB)	DTNB assay	0.9043	0
+L-Glu transporter uptake assay	Direct quantification of L-Glu transporter activity (Radioligand uptake)	0.917	1
+Diverse Mobility assays	Diverse Mobility assay	0.9848	0
+Electron Paramagnetic Resonance (EPR)	EPR (electron paramagnetic resonance spectroscopy)	0.9508	0
+Electric Cell-Substrate Impedance Sensing (ECIS)	Electric Cell-Substrate Impedance Sensing	0.9421	1
+endo H digestion analysis	Endo H digestion	0.9508	0
+Ex vivo NMR with metabolomic profiling	Ex vivo NMR and targeted metabolomics	0.9237	0
+extracellular flux analyzer assay	Extracellular flux analysis	0.9223	0
+FLU-TTR assay	FLU-TTR	0.9026	0
+Radio-labeled fatty acid beta oxidation assay	Fatty Acid Beta Oxidation Assay	0.9422	1
+Mitochondrial fatty acid beta oxidation assay	Fatty Acid Beta Oxidation Assay	0.9158	0
+flow cytometry (DCFH-DA)	Flow Cytometry with DCFH-DA	0.9886	0
+flow cytometry (Dih123)	Flow Cytometry with Dih123	0.9666	0
+HLA-DQ–gluten tetramer flow cytometry	Flow cytometry with HLA-DQ–gluten tetramers	0.974	0
+Fluo3 AM imaging	Fluo3 AM fluorescence imaging	0.9801	0
+Fluorescence Correlation Spectroscopy (FCS)	Fluorescence Correlation Spectroscopy	0.9543	1
+fluorescence binding assay	Fluorescent binding assay	0.9833	0
+fluorescence binding assays	Fluorescent binding assay	0.9791	0
+fluorescence displacement assay (FLU-TTR)	Fluorescent displacement assay (FLU-TTR)	0.9942	0
+fluorometric enzyme kinetics assay	Fluorometric assay for enzyme kinetics	0.9824	0
+Forepaw stride length test	Forepaw Stride length	0.9135	0
+glutathione depletion assay	GSH depletion assay	0.953	1
+GSH:GSSG ratio detection assay	GSH/GSSG Ratio Detection Assay	0.986	1
+Homeostatic Model for Insulin Resistance (HOMA-IR)	HOMA-IR	0.9427	1
+HPLC-UV	HPLC with UV-detection	0.9394	0
+hemagglutination inhibition (HAI) assay	Hemagglutination assay (HAI)	0.9725	0
+hemagglutination assay	Hemagglutination assay (HAI)	0.9058	1
+Hershberger Bioassay in Rats	Hershberger Bioassay	0.9406	1
+I-O curve measurement	I-O curve (input-output curve)	0.9034	1
+imaging techniques	Imaging procedures	0.9129	0
+α-SMA immunohistochemistry	Immunofluorescent staining for α-SMA	0.9116	0
+NMDA receptor targeting prediction	In silico NMDA receptor targeting prediction	0.9322	1
+in vitro gluconeogenic capacity assay	In vitro assessment of gluconeogenic capacity	0.9681	0
+Transgenic endothelial reporter zebrafish assay	In vivo zebrafish endothelial reporter assay	0.9377	1
+Inductively coupled plasma mass spectrometry (ICPMS)	Inductively coupled plasma mass spectrometry (ICP-MS)	0.9746	1
+KeratinoSens™	KeratinoSens	0.9627	0
+Ki67 probe	Ki67 assay	0.9549	1
+LC-inductively coupled plasma–mass spectrometry	LC-ICP-MS	0.9123	1
+Long-term potentiation (LTP) induction	LTP induction	0.9342	1
+Lucifer Yellow leakage assay	Lucifer Yellow (LY) leakage assay	0.99	1
+Luminometric luciferase/luciferin assay	Luciferin-luciferase assay	0.9739	0
+Lysotracker green staining	LysoTracker Red staining	0.9562	1
+MMP assay	MMP activity assay	0.9536	0
+MSD multiplex electrochemiluminescent immunoassay	MSD electrochemiluminescent immunoassay	0.9363	0
+SDH activity assay (MTT/PMS)	MTT assay for SDH activity	0.9234	1
+Matrigel plug assay	Matrigel assay	0.9441	1
+Micronucleus (MN) microscopy	Micronuclei (MN) Assay via Microscopy	0.9636	1
+Micronucleus Assay by Microscopy in vivo	Micronuclei (MN) Assay via Microscopy	0.9392	1
+Micronucleus assay	Micronuclei (MN) Assay via Microscopy	0.9167	1
+micronuclei assay	Micronuclei (MN) Assay via Microscopy	0.9167	1
+NMR studies	NMR analysis	0.9484	0
+NVS_IC_rNaCh_site2	NVS_IC_rNaCh_site 2	0.9771	1
+Neutral red uptake assay	Neutral red uptake	0.9318	0
+PPARγ reporter assay kit	PPARγ (mouse/rat) Reporter Assay Kit	0.907	1
+PPARγ antagonist assay	PPARγ antagonism assay	0.9655	0
+Permeability assay	Permeability Assays	0.9932	0
+membrane permeability assay	Permeability Assays	0.9064	0
+Pharmacological inhibition assay	Pharmacologic inhibitor assay	0.9275	0
+Pollen load scoring	Pollen load assessment	0.9514	0
+promoter-reporter assay for M-CPT I	Promoter-reporter plasmid assay (human M-CPT I)	0.9447	1
+protein carbonyl content assay	Protein carbonyl assays	0.9481	0
+Prothrombin time measurement	Prothrombin time (PT)	0.9488	1
+prothrombin time	Prothrombin time (PT)	0.9488	1
+Quantitative reverse transcription PCR (qRT-PCR)	Quantitative Real-Time PCR (qRT-PCR)	0.9629	1
+quantitative reverse transcription polymerase chain reaction (qRT-PCR)	Quantitative Real-Time PCR (qRT-PCR)	0.9501	1
+quantitative real-time PCR	Quantitative Real-Time PCR (qRT-PCR)	0.9415	1
+RAR-RXR-RARE/RXR-RXR-RARE reporter assay	RAR-RXR-RARE reporter assay	0.9761	0
+intracellular ROS assay	ROS production assay	0.9132	0
+quantitative reverse transcription-polymerase chain reaction (RT-PCR)	RT-PCR / qPCR	0.9149	1
+qPCR and RT-PCR	RT-PCR / qPCR	0.9016	0
+radioactive iodine uptake test	Radioiodide uptake assay	0.9351	1
+respirometer metabolism chambers	Respirometer-metabolism chamber	0.9857	0
+Rey Osterrieth Complex Figure Test	Rey Osterieth Complex Figure Test	0.9064	0
+Serial sectioning with stereo microscopy, imaging, morphometric analysis	Serial sectioning with stereo microscopy	0.9303	0
+estrogen serum levels	Serum estrogen analysis	0.9327	0
+blood serum β-hydroxybutyrate measurement	Serum β-hydroxybutyrate measurement	0.9785	1
+revised Smith-modified Kernahan ‘Y’ classification	Smith-modified Kernahan 'Y' classification	0.9209	0
+Stereomicroscopy for swim bladder inflation	Stereomicroscopy for anterior swim bladder inflation	0.9554	0
+immunocytochemistry for TH	TH immunocytochemistry	0.9725	0
+thymidine analogue incorporation	Thymidine incorporation	0.9152	0
+thymidine kinase gene mutation assay	Thymidine kinase gene mutation test	0.9853	0
+Transepithelial electrical resistance (TEER)	Trans-Endothelial Electrical Resistance (TEER)	0.974	0
+isotope-free competitive binding assay with UPLC-MS	UPLC-MS competitive binding assay	0.9149	1
+UROD enzyme assay with HPLC	UROD enzyme assay	0.92	1
+Urine test strips with reflectometry	Urine test strips (reflectometry)	0.9631	0
+vaginal opening assessment	Visual assessment of vaginal opening	0.9481	1
+Wechsler Memory Scale Logical Memory Test Battery	Wechsler Memory Scale Logical Memory Test	0.9579	0
+area analysis of heart/edema	area analysis of heart and edema	0.9504	0
+cytogenetic assays	cytogenetic assay	0.9948	0
+phenotypic secondary sex characteristic observation	direct observation of phenotypic secondary sex characteristics	0.9061	1
+fecal egestion measurement	fecal egestion	0.9353	0
+guaiacol oxidation kinetic assay	guaiacol oxidation assay	0.91	0
+heartbeat rate measurement	heart rate measurement	0.9083	0
+high-performance liquid chromatography	high performance liquid chromatography (HPLC)	0.9521	1
+histological section analysis	histological analysis	0.923	0
+qualitative histological assessment	histological analysis	0.9014	0
+immunophenotyping	immunophenotypic analyses	0.9623	0
+immunoprecipitation-HPLC assay	immunoprecipitation-HPLC	0.9679	0
+in vivo complex of enzyme (ICE) assay	in vivo complex enzyme assay (ICE)	0.9776	0
+intracellular recordings	intracellular electrode recording	0.9361	0
+nasal potential difference (NPD)	nasal potential difference	0.913	1
+non-contrasted head computed tomogram (CT)	non-contrasted head CT	0.9513	0
+nuclear receptor reporter assays	nuclear receptor reporter assay	0.9932	0
+organ breakdown product examination	organ breakdown product analysis	0.9178	0
+ovarian tissue explant steroidogenesis assay	ovarian tissue explant assay	0.9227	0
+para-nitrophenol oxidation assay	para-nitrophenol oxidation	0.913	0
+puromycin incorporation assay	puromycin incorporation	0.9019	0
+radiolabeled tracer incorporation	radiolabel incorporation	0.931	1
+stereological cell counts	stereological cell counting	0.9796	1
+stomach contents analysis	stomach content analysis	0.9831	0
+γ-H2AX foci assay	γ-H2AX Foci Quantification - Flow Cytometry	0.9338	1
+Immunofluorescent staining	immunofluorescence	0.9242	0
+enzyme activity measurement	enzyme activity assay	0.971	0
+microscope	microscopy	0.9122	0
+light microscopy	microscopy	0.9006	1
+alkali-labile phosphoprotein	alkali-labile phosphoprotein assay	0.9044	0
+Colorimetric H2O2 probe	colorimetric h2o2 assay	0.9119	1
+EdU assay	edu incorporation assay	0.9592	0
+L-arginine to L-citrulline conversion assay	l-arginine to l-citrulline assay	0.9508	0
+Positron emission tomography	positron emission tomography (pet)	0.9606	1
+ECG (Electrocardiogram)	electrocardiogram	0.9791	1

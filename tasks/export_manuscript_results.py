@@ -33,6 +33,7 @@ import statistics
 from pathlib import Path
 
 from tasks.logutil import setup_logging
+from tasks.manuscript_publish import publish_technique_stats
 
 # ── Ploomber task header ──────────────────────────────────────────────────────
 # + tags=["parameters"]
@@ -896,6 +897,12 @@ if enabled:
         out["worked_examples"] = worked
         logger.info(f"worked examples: {len(worked)}/{len(worked_example_kes)} KEs resolved"
                     + (f", track_consistency for {len(tc_per_ke)} models" if tc_per_ke else ""))
+
+    # Publish the assay stage's raw technique stats next to the other generated files
+    # (verbatim copy; the summarised subset in out["technique_stats"] is unchanged).
+    published = publish_technique_stats(technique_stats_json, repo)
+    if published:
+        logger.info(f"published technique stats -> {published}")
 
     # Independent of crossmodel_dir: scored per model against the published curation,
     # not against the panel, so it is read whether or not this section has a crossmodel.
