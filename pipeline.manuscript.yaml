@@ -21,6 +21,8 @@ tasks:
       json: "{{manuscript_repo}}/manuscript/generated/kec116_stats.json"
       # Supplementary Table S1 (the whole pilot panel); a .tsv of it is written alongside
       panel: "{{manuscript_repo}}/manuscript/supplementary/table_s1_model_panel.md"
+      # Supplementary Table S2 (same-checkpoint pairs' triple-set Jaccard vs all panel pairs)
+      lineage_table: "{{manuscript_repo}}/manuscript/supplementary/table_s2_lineage_jaccard.md"
     params:
       crossmodel_dir: "{{kec116_crossmodel_dir}}"
       manuscript_repo: "{{manuscript_repo}}"

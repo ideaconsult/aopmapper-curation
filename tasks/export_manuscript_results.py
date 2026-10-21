@@ -36,6 +36,7 @@ from tasks.aop451_per_model import (assay_union, panel_kec_recovery, panel_poole
                                     per_model_block, per_model_rows)
 from tasks.aop451_per_model import write_assays_ref_table, write_panel_table
 from tasks.aop451_per_model import write_table as write_per_model_table
+from tasks.lineage_table import write_lineage_table
 from tasks.logutil import setup_logging
 from tasks.manuscript_publish import publish_technique_stats
 
@@ -61,9 +62,10 @@ reference_check_json = None    # optional: aop451_reference_check.py's json — 
                                 # the published manual curation (the one outside reference)
 viz_assay_consensus_json = None  # optional: assay consensus clusters, for the panel-level
                                   # top-support assays per worked-example KE
-lineage_pairs = []             # optional: [{"a": model, "b": model, "relation": str}] -
-                                # same-checkpoint pairs whose triple-set Jaccard is reported
-                                # against the panel-wide pairwise distribution
+lineage_pairs = []             # optional: [{"a": model, "b": model, "relation": str,
+                                # "label": str}] - same-checkpoint pairs whose triple-set
+                                # Jaccard is reported against the panel-wide pairwise
+                                # distribution; label/relation are the Table S2 row text
 onto_recovery_json = None      # optional: tasks/kec_onto_recovery.py's output JSON - per-
                                 # ontology curated-triple recovery (true triple granularity,
                                 # not the cluster-level crossmodel_overview numbers)
@@ -856,6 +858,9 @@ if enabled:
         lineage = _lineage_jaccard(crossmodel)
         if lineage:
             out["lineage_jaccard"] = lineage
+            if "lineage_table" in product:
+                n = write_lineage_table(lineage, Path(product["lineage_table"]))
+                logger.info(f"lineage table: {n} pairs -> {product['lineage_table']}")
             logger.info(f"lineage Jaccard: {len(lineage['pairs'])} pairs vs "
                         f"{lineage['distribution']['n_pairs']} panel pairs")
 
