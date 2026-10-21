@@ -69,17 +69,16 @@ def test_write_table_fragment(tmp_path):
     assert write_table(per_model_rows(RESULTS), md) == 3
     assert list(tmp_path.rglob("*.tsv")) == []  # no supplementary / TSV companion
     lines = md.read_text(encoding="utf-8").split("\n")
-    assert lines[0] == ("| Model | KEC triples recovered | KEC recall (%) | "
-                        "Recommended methods matched | Matched (%) |")
-    assert lines[1] == "|---|---:|---:|---:|---:|"
-    assert lines[2] == "| model-a | 6 | 28.6 | 5 | 26.3 |"
-    assert lines[4] == "| Nemotron-3-Super-120B | 3 | 14.3 | 6 | 31.6 |"
+    assert lines[0] == "| Model | Recommended methods matched | Matched (%) |"
+    assert lines[1] == "|---|---:|---:|"
+    assert lines[2] == "| model-a | 5 | 26.3 |"
+    assert lines[4] == "| Nemotron-3-Super-120B | 6 | 31.6 |"
     assert lines[5] == ""
     assert lines[6] == (
-        "Table: AOP 451 reference check for each model of the three-model panel: recovery of "
-        "the 21 curated KEC triples of the pathway in AOP-Wiki, and match to the 19 "
-        "standardized assays recommended in Figure 1 of @nymark2021. {#tbl:aop451-per-model}")
+        "Table: Recommended methods of Figure 1B of @nymark2021 matched by each model of the "
+        "three-model panel (19 methods in total). {#tbl:aop451-per-model}")
     assert lines[7:] == [""]
+    assert "KEC" not in md.read_text(encoding="utf-8")
 
 
 PANEL_KEC = {"n_models": 3, "totals": {"n_curated": 21, "n_recovered_any": 14}}
@@ -107,16 +106,15 @@ def test_write_table_with_panel_row(tmp_path):
     panel = panel_pooled_row(PANEL_KEC, CONSENSUS)
     assert write_table(per_model_rows(RESULTS), md, panel) == 3  # models, not rows
     lines = md.read_text(encoding="utf-8").split("\n")
-    assert lines[4] == "| Nemotron-3-Super-120B | 3 | 14.3 | 6 | 31.6 |"
-    assert lines[5] == "| **Panel (pooled)** | **14** | **66.7** | **5** | **26.3** |"
+    assert lines[4] == "| Nemotron-3-Super-120B | 6 | 31.6 |"
+    assert lines[5] == "| **Panel (pooled)** | **5** | **26.3** |"
     assert lines[6] == ""
     assert lines[7] == (
-        "Table: AOP 451 reference check for each model of the three-model panel: recovery of "
-        "the 21 curated KEC triples of the pathway in AOP-Wiki, and match to the 19 "
-        "standardized assays recommended in Figure 1 of @nymark2021. The last row pools the "
-        "panel: a curated triple counts as recovered if at least one of the three models "
-        "finds it, and a recommended method as matched if at least one of the three models "
-        "matches it on its own. {#tbl:aop451-per-model}")
+        "Table: Recommended methods of Figure 1B of @nymark2021 matched by each model of the "
+        "three-model panel (19 methods in total). The last row pools the panel: a method "
+        "counts as matched if at least one of the three models matches it on its own. "
+        "{#tbl:aop451-per-model}")
+    assert "KEC" not in md.read_text(encoding="utf-8")
 
 
 def test_table_without_panel_has_no_pooled_row():

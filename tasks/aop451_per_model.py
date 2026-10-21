@@ -4,8 +4,9 @@ Import-safe library used by tasks/export_manuscript_results.py (the export_aop45
 
 Reads aop451_reference_check.py's json (results[model]['kec'] / ['assays']) and produces
 (1) a per-model list plus min/max/median summary for aop451_stats.json and (2) a generated
-pandoc-crossref markdown fragment (pipe table + caption, {#tbl:aop451-per-model}) that the
-manuscript includes verbatim.
+pandoc-crossref markdown fragment (assay-only pipe table + caption, {#tbl:aop451-per-model})
+that the manuscript includes verbatim. The KEC side stays in the stats json and the separate
+{#tbl:aop451-kec} fragment.
 
 Also the pooled-panel view (panel_kec_recovery + the {#tbl:aop451-kec} fragment): for each
 curated KEC triple, how many models recover it; and the pooled assay figure (assay_union +
@@ -18,8 +19,7 @@ import re
 import statistics
 from pathlib import Path
 
-TABLE_HEADER = ["Model", "KEC triples recovered", "KEC recall (%)",
-                "Recommended methods matched", "Matched (%)"]
+TABLE_HEADER = ["Model", "Recommended methods matched", "Matched (%)"]
 
 # Trailing quantisation / precision / packaging tokens dropped from a Hugging Face model name
 # (applied repeatedly, in any order, from the end of the name), then instruct-release tags.
@@ -136,6 +136,8 @@ def _count_word(n: int) -> str:
 def render_table(rows: list[dict], panel: dict | None = None) -> str:
     """The markdown fragment: pipe table, blank line, pandoc-crossref caption line.
 
+    Assay-only (recommended methods of Figure 1B of Nymark 2021); the KEC columns live in
+    the per-model block of aop451_stats.json and the separate panel KEC table.
     `panel` (from `panel_pooled_row`) appends the bold `**Panel (pooled)**` row and the
     sentence in the caption that states how the panel is pooled."""
     lines = [
@@ -143,30 +145,27 @@ def render_table(rows: list[dict], panel: dict | None = None) -> str:
         "|" + "|".join(["---"] + ["---:"] * (len(TABLE_HEADER) - 1)) + "|",
     ]
     for r in rows:
-        cells = [display_name(r["model"]), _cell(r["kec_n_matched"]), _pct(r["kec_recall"]),
-                 _cell(r["assay_n_recovered"]), _pct(r["assay_recovery_rate"])]
+        cells = [display_name(r["model"]), _cell(r["assay_n_recovered"]),
+                 _pct(r["assay_recovery_rate"])]
         lines.append("| " + " | ".join(cells) + " |")
     if panel is not None:
-        cells = ["Panel (pooled)", _cell(panel["kec_n_matched"]), _pct(panel["kec_recall"]),
-                 _cell(panel["assay_n_recovered"]), _pct(panel["assay_recovery_rate"])]
+        cells = ["Panel (pooled)", _cell(panel["assay_n_recovered"]),
+                 _pct(panel["assay_recovery_rate"])]
         lines.append("| " + " | ".join(f"**{c}**" for c in cells) + " |")
-    n_cur = next((r["kec_n_curated"] for r in rows if r["kec_n_curated"] is not None), "")
     n_ref = next((r["assay_n_reference"] for r in rows if r["assay_n_reference"] is not None), "")
-    caption = (f"Table: AOP 451 reference check for each model of the {_count_word(len(rows))}-model "
-               f"panel: recovery of the {n_cur} curated KEC triples of the pathway in AOP-Wiki, and "
-               f"match to the {n_ref} standardized assays recommended in Figure 1 of @nymark2021.")
+    caption = (f"Table: Recommended methods of Figure 1B of @nymark2021 matched by each model of "
+               f"the {_count_word(len(rows))}-model panel ({n_ref} methods in total).")
     if panel is not None:
-        caption += " " + _pooling_sentence(panel)
+        caption += " " + _pooling_sentence(panel, len(rows))
     caption += " {#tbl:aop451-per-model}"
     return "\n".join(lines) + "\n\n" + caption + "\n"
 
 
-def _pooling_sentence(panel: dict) -> str:
+def _pooling_sentence(panel: dict, n_models: int) -> str:
     k = _count_word(panel["pool_min_support"])
-    n = _count_word(panel["n_models"])
-    return (f"The last row pools the panel: a curated triple counts as recovered if at least "
-            f"{k} of the {n} models finds it, and a recommended method as matched if at "
-            f"least {k} of the {n} models matches it on its own.")
+    n = _count_word(n_models)
+    return (f"The last row pools the panel: a method counts as matched if at least {k} of the "
+            f"{n} models matches it on its own.")
 
 
 def write_table(rows: list[dict], md_path: Path, panel: dict | None = None) -> int:
