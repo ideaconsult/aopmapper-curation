@@ -32,6 +32,10 @@ import shutil
 import statistics
 from pathlib import Path
 
+from tasks.aop451_per_model import (assay_union, panel_kec_recovery, panel_pooled_row,
+                                    per_model_block, per_model_rows)
+from tasks.aop451_per_model import write_assays_ref_table, write_panel_table
+from tasks.aop451_per_model import write_table as write_per_model_table
 from tasks.logutil import setup_logging
 from tasks.manuscript_publish import publish_technique_stats
 
@@ -63,6 +67,9 @@ lineage_pairs = []             # optional: [{"a": model, "b": model, "relation":
 onto_recovery_json = None      # optional: tasks/kec_onto_recovery.py's output JSON - per-
                                 # ontology curated-triple recovery (true triple granularity,
                                 # not the cluster-level crossmodel_overview numbers)
+min_support = None             # consensus threshold (env.consensus.yaml's min_support): a curated
+                                # triple counts as consensus-recovered if >= this many models
+                                # recover it. Required when reference_check_json is given.
 # -
 
 logger = setup_logging(Path(product["json"]).parent / "export_manuscript_results.log")
@@ -909,6 +916,44 @@ if enabled:
     ref = _reference_check(reference_check_json)
     if ref:
         out["reference_check"] = ref
+        # All models in the reference-check json (not just the worked examples): flat
+        # per-model rows + min/max/median across models, and the main-text per-model table.
+        raw_results = _load_json(Path(reference_check_json)).get("results") or {}
+        out["per_model_summary"] = per_model_block(raw_results)
+        if min_support is None:
+            raise ValueError("min_support param is required with reference_check_json "
+                             "(panel_kec_recovery consensus threshold)")
+        out["panel_kec_recovery"] = panel_kec_recovery(raw_results, int(min_support))
+        pk = out["panel_kec_recovery"]
+        logger.info(f"panel KEC semantic check: {pk['semantic_check']}")
+        logger.info(f"panel KEC recovery: totals={pk['totals']}")
+        # pooled-panel assay figure: a TRUE union of the models' own per-method matches (a
+        # method counts if ANY model matches it in its own result). Replaces the cluster-
+        # representative score (reference_check.consensus_assays, still carried unchanged),
+        # which can fall below the best single model.
+        out["assay_union"] = assay_union(raw_results)
+        au = out["assay_union"]
+        logger.info(f"assay union: {au['n_matched_any']}/{au['n_reference_assays']} methods "
+                    f"matched by >=1 of {au['n_models']} models; best single "
+                    f"{au['best_single_n']} ({au['best_single_models']}); cluster-scored "
+                    f"(old) {(ref.get('consensus_assays') or {}).get('n_recovered')}")
+        # pooled-panel row of the per-model table: KEC from panel_kec_recovery, assays from
+        # the assay union above
+        out["panel_pooled_row"] = panel_pooled_row(pk, au)
+        logger.info(f"panel pooled row: {out['panel_pooled_row']}")
+        if "per_model_table" in product:
+            n = write_per_model_table(per_model_rows(raw_results),
+                                      Path(product["per_model_table"]),
+                                      out["panel_pooled_row"])
+            logger.info(f"AOP 451 per-model table: {n} models + pooled panel row -> "
+                        f"{product['per_model_table']}")
+        if "assays_ref_table" in product:
+            n = write_assays_ref_table(au, Path(product["assays_ref_table"]))
+            logger.info(f"AOP 451 recommended-methods table: {n} methods + union row -> "
+                        f"{product['assays_ref_table']}")
+        if "kec_panel_table" in product:
+            n = write_panel_table(pk, Path(product["kec_panel_table"]))
+            logger.info(f"AOP 451 KEC panel table: {n} KEs -> {product['kec_panel_table']}")
         for model, r in ref["per_model"].items():
             logger.info(
                 f"reference check {model}: KEC {r['kec_n_matched']}/{r['kec_n_curated']}, "

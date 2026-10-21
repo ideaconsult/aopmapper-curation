@@ -94,7 +94,18 @@ tasks:
     product:
       nb:   "{{manuscript_repo}}/manuscript/generated/aop451_export.ipynb"
       json: "{{manuscript_repo}}/manuscript/generated/aop451_stats.json"
+      # Main-text per-model AOP 451 reference-check table: markdown pipe table + crossref
+      # caption ({#tbl:aop451-per-model}), included verbatim by the manuscript
+      per_model_table: "{{manuscript_repo}}/manuscript/generated/aop451_per_model_table.md"
+      # Pooled-panel KEC recovery table ({#tbl:aop451-kec}): curated triples found by >= 1 and
+      # >= min_support models vs the best single model
+      kec_panel_table: "{{manuscript_repo}}/manuscript/generated/aop451_kec_panel_table.md"
+      # Recommended methods (Figure 1B) vs the number of models whose own result matches each,
+      # with the union row ({#tbl:aop451-assays-ref})
+      assays_ref_table: "{{manuscript_repo}}/manuscript/generated/aop451_assays_ref_table.md"
     params:
+      # consensus threshold for the pooled-panel KEC recovery (same value as env.consensus.yaml)
+      min_support: "{{consensus_min_support}}"
       manuscript_repo: "{{manuscript_repo}}"
       section_name: "aop451"
       products_dir: "{{aop451_kec_products_dir}}"
