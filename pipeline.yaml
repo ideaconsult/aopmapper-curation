@@ -49,12 +49,39 @@ tasks:
       # technique-vs-record counts + most-reused techniques; the only place the two
       # exist together (name consolidation happens here), so the manuscript cites it
       stats: "{{products}}/solr/assay_technique_stats.json"
+      # the filtered, label-bearing records the XML export reads (export_assays_xml)
+      xml_records: "{{products}}/solr/xml_records.json"
+      # permanent ASSAY<n> numbers (pipeline-maintained resource, like assay_synonyms.json)
+      assay_ids: "resources/assay_ids.json"
+      technique_ids: "resources/technique_ids.json"
     params:
       viz_assay_consensus_json: "{{assays_products}}/crossmodel/{{assays_crossmodel}}/viz_assay_consensus.json"
       assays_products: "{{assays_products}}"
       assay_min_support: "{{assay_min_support}}"
       assay_synonyms: "resources/assay_synonyms.json"
       iri_min_freq: 2
+
+  # xsdata-pydantic bindings for the assay XML (aopkb/methods2aop.py, from the single
+  # resources/methods2aop_schema_proposal.xsd). Not part of the data flow.
+  - source: tasks/gen_assay_bindings.py
+    product:
+      nb: "{{products}}/gen_assay_bindings.ipynb"
+      methods2aop: "aopkb/methods2aop.py"
+    params:
+      proposal_xsd: "resources/methods2aop_schema_proposal.xsd"
+
+  # Curated assays as XML valid against resources/methods2aop_schema_proposal.xsd (<assays>
+  # container), a validation/coercion report, and a static HTML view via resources/xslt/assays.xsl.
+  - source: tasks/export_assays_xml.py
+    upstream: ["assay_consensus2solr"]
+    product:
+      nb: "{{products}}/export_assays_xml.ipynb"
+      xml: "{{products}}/xml/assays.xml"
+      html: "{{products}}/xml/assays.html"
+      report: "{{products}}/xml/xml_report.json"
+    params:
+      assays_xsd: "resources/methods2aop_schema_proposal.xsd"
+      assays_xslt: "resources/xslt/assays.xsl"
 
   - source: tasks/ke_graph.py
     upstream: ["parse_pydantic"]    

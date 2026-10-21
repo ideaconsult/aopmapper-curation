@@ -30,9 +30,30 @@ wiki-derived ontology docs, and only when OLS resolved them (hard gate, both tra
 
 Ploomber:
   upstream: ["ke_graph", "assay_synonyms_update"]
-  product:  {"nb", "json", "assays_ke_cleaned", "stats"}
+  product:  {"nb", "json", "assays_ke_cleaned", "stats", "xml_records", "assay_ids",
+            "technique_ids"}
   params:   viz_assay_consensus_json, assays_products, assay_min_support,
             assay_synonyms, iri_min_freq, model_version
+
+`assay_ids` is the permanent-number registry resources/assay_ids.json {assay identity -> n}: a
+ke_assay doc id is ASSAY<n> (like the wiki's KE1234), assigned once per (KE, normalised name,
+normalised endpoint) from an append-only registry (never removed, a number never goes to a
+different identity); new identities get max+1. The id does not
+depend on the technique group. Records that share an identity share an id and are counted
+as `n_ke_assay_id_collisions` in the stats product.
+
+`technique_ids` is the same for techniques (resources/technique_ids.json, {group key -> n}, doc
+id TECH<n>; append-only). The group key is the canonical name after synonym resolution. A
+key without a number gets max+1; a key merged into another keeps its entry, so an undone
+merge restores its old number. An id changes only through an explicit merge: the canonical
+keeps (or, if new, gets) its number and each absorbed alias number is reported - WARNING
+plus `retired_technique_ids` {absorbed id -> surviving id} in the stats product (references
+to absorbed ids go stale by necessity).
+
+`xml_records` is {"records": [...], "techniques": [...]}: the filtered per-(KE, assay)
+records (with ontology labels, the Solr ids `id`/`technique_id` and the KE's AOP-Wiki UUID
+`ke_uuid`) and the assay techniques (id, name, synonyms), consumed by
+tasks/export_assays_xml.py.
 
 `stats` carries the technique-vs-record counts and the most-reused techniques (each with
 the distinct endpoints it measures). Those two counts only exist together here, after
@@ -51,7 +72,10 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Optional
 
-from tasks.assay_names import build_synonym_map, resolve
+from tasks.assay_names import (assay_identity, assign_ids, assign_technique_ids,
+                                build_synonym_map, load_id_registry, resolve,
+                                technique_id, write_id_registry)
+from tasks.assay_names import ke_assay_id as make_ke_assay_id
 from tasks.kec_compare import iri_to_solr_id
 from tasks.logutil import setup_logging
 from tasks.utils import get_kid
@@ -107,11 +131,6 @@ def _kec_triple_fields(kec_triple: Optional[dict]) -> dict:
     return out
 
 
-def _group_hash(group_key: str) -> str:
-    """8-char hex of the group key — stable technique-id anchor."""
-    return hashlib.md5(group_key.encode()).hexdigest()[:8]
-
-
 def _clean_display(name: str) -> str:
     return re.sub(r"\s+", " ", name.lower().strip())
 
@@ -164,6 +183,7 @@ def clusters_to_records(viz: dict, current_ke_ids: set[str],
                 continue
 
             iris: list[str] = []
+            terms: list[dict] = []     # same terms as `iris`, with the label kept
             for term in rec.get("ontology_terms") or []:
                 sid = iri_to_solr_id(term.get("iri"))
                 if not sid:
@@ -171,6 +191,8 @@ def clusters_to_records(viz: dict, current_ke_ids: set[str],
                 if sid in valid_solr_ids:
                     if sid not in iris:
                         iris.append(sid)
+                        terms.append({"name": (term.get("name") or "").strip(),
+                                      "id": sid, "source": term.get("source")})
                 else:
                     n_dropped_iri += 1
 
@@ -182,6 +204,8 @@ def clusters_to_records(viz: dict, current_ke_ids: set[str],
                 "measured_endpoint": rec.get("measured_endpoint") or "",
                 "endpoint_direction": rec.get("endpoint_direction") or "not_specified",
                 "ontology_ids": iris,
+                # label-bearing twin of ontology_ids (the XML export needs the label)
+                "ontology_terms": terms,
                 "cell_types": rec.get("cell_types") or [],
                 "organ_tissue": rec.get("organ_tissue") or [],
                 "species": rec.get("species") or [],
@@ -207,7 +231,8 @@ def clusters_to_records(viz: dict, current_ke_ids: set[str],
 # ── document builder ──────────────────────────────────────────────────────────
 
 def build_solr_docs(records: list[dict], model_version: str, iri_min_freq: int,
-                    synonym_map: dict[str, str]) -> tuple[list[dict], dict]:
+                    synonym_map: dict[str, str], assay_ids: dict[str, int],
+                    technique_numbers: dict[str, int]) -> tuple[list[dict], dict]:
     """Pass 1 accumulates per-group-key evidence (ids, IRIs, surface forms, votes);
     pass 2 emits one assay_technique per group key and one ke_assay per record."""
 
@@ -238,7 +263,7 @@ def build_solr_docs(records: list[dict], model_version: str, iri_min_freq: int,
     for gk, ke_set in ke_ids.items():
         best_name = canon_display[gk]
         tech_by_gk[gk] = {
-            "id": f"TECH_{_group_hash(gk)}",
+            "id": technique_id(technique_numbers[gk]),
             "type_s": "assay_technique",
             "name_t": best_name,
             "name_clean_t": _clean_display(best_name),
@@ -263,7 +288,8 @@ def build_solr_docs(records: list[dict], model_version: str, iri_min_freq: int,
     assays_ke_cleaned: dict[str, list] = defaultdict(list)
     for rec, gk in zip(records, group_keys):
         tech_id = tech_by_gk[gk]["id"]
-        ke_assay_id = f"KEASSAY_{rec['ke_id']}_{_group_hash(gk)}"
+        ke_assay_id = make_ke_assay_id(assay_ids, rec["ke_id"], rec["assay_name"],
+                                       rec["measured_endpoint"])
         ke_assay_docs.append({
             "id": ke_assay_id,
             "type_s": "ke_assay",
@@ -313,6 +339,9 @@ current_ke_ids = {
     for uuid in lookup.get("key-event-reference", {})
 }
 current_ke_ids.discard(None)
+# KEnnn -> the Key Event's AOP-Wiki UUID, for the XML export (which links by UUID)
+ke_uuid_by_id = {get_kid(lookup, uuid, "key-event-reference"): uuid
+                 for uuid in lookup.get("key-event-reference", {})}
 logger.info(f"current release: {len(current_ke_ids)} KEs")
 
 with open(viz_assay_consensus_json, encoding="utf-8") as f:
@@ -331,17 +360,69 @@ logger.info(f"synonym map: {synonym_file}")
 records = clusters_to_records(
     viz, current_ke_ids, valid_solr_ids, int(assay_min_support))
 
+# permanent ASSAY<n> numbers: existing assay identities keep theirs, new ones get max+1
+assay_id_registry = load_id_registry(product["assay_ids"])
+n_registry_before = len(assay_id_registry)
+n_new_assay_ids = assign_ids(
+    (assay_identity(r["ke_id"], r["assay_name"], r["measured_endpoint"]) for r in records),
+    assay_id_registry)
+write_id_registry(assay_id_registry, product["assay_ids"])
+logger.info(f"assay id registry {product['assay_ids']}: {n_registry_before} -> "
+            f"{len(assay_id_registry)} identities ({n_new_assay_ids} new)")
+
+# permanent TECH<n> numbers, keyed by the group key (canonical name after synonym
+# resolution); append-only registry, merges reported in retired_technique_ids
+synonym_map = build_synonym_map(synonym_file)
+technique_registry = load_id_registry(product["technique_ids"])
+n_tech_registry_before = len(technique_registry)
+technique_numbers, retired_technique_ids = assign_technique_ids(
+    [resolve(r["assay_name"], synonym_map) for r in records],
+    technique_registry, synonym_map)
+retired_technique_ids = {technique_id(old): technique_id(new)
+                         for old, new in sorted(retired_technique_ids.items())}
+if retired_technique_ids:
+    logger.warning(
+        f"{len(retired_technique_ids)} technique ids absorbed by a synonym merge "
+        f"(references to them go stale): "
+        + ", ".join(f"{o} -> {n}" for o, n in retired_technique_ids.items()))
+write_id_registry(technique_registry, product["technique_ids"])
+logger.info(f"technique id registry {product['technique_ids']}: "
+            f"{n_tech_registry_before} -> {len(technique_registry)} identities, "
+            f"{len(set(technique_numbers.values()))} techniques in use")
+
 solr_docs, assays_ke_cleaned = build_solr_docs(
     records=records,
     model_version=model_version,
     iri_min_freq=int(iri_min_freq),
-    synonym_map=build_synonym_map(synonym_file),
+    synonym_map=synonym_map,
+    assay_ids=assay_id_registry,
+    technique_numbers=technique_numbers,
 )
 
 out_json = Path(product["json"])
 out_json.parent.mkdir(parents=True, exist_ok=True)
 with open(out_json, "w", encoding="utf-8") as f:
     json.dump(solr_docs, f, ensure_ascii=False)
+
+# The filtered, label-bearing records themselves (current-release KEs, OLS-valid ontology
+# ids, support gate) — the exact input of the XML export (tasks/export_assays_xml.py), so
+# the XML cannot drift from the curation filters applied above.
+out_xml_records = Path(product["xml_records"])
+out_xml_records.parent.mkdir(parents=True, exist_ok=True)
+with open(out_xml_records, "w", encoding="utf-8") as f:
+    # `id` / `technique_id` are the ke_assay / assay_technique doc ids (ASSAY<n>,
+    # TECH<n>), so the XML lookup section and Solr share ids; build_solr_docs emits
+    # exactly one ke_assay doc per record, in record order
+    ke_assay_docs = [d for d in solr_docs if d["type_s"] == "ke_assay"]
+    assert len(ke_assay_docs) == len(records)
+    json.dump({
+        "records": [{**r, "id": d["id"], "technique_id": d["technique_id_s"],
+                     "ke_uuid": ke_uuid_by_id.get(r["ke_id"])}
+                    for r, d in zip(records, ke_assay_docs)],
+        "techniques": [{"id": d["id"], "name": d["name_t"],
+                        "synonyms": d["attr_synonyms"]}
+                       for d in solr_docs if d["type_s"] == "assay_technique"],
+    }, f, ensure_ascii=False)
 
 out_cleaned = Path(product["assays_ke_cleaned"])
 out_cleaned.parent.mkdir(parents=True, exist_ok=True)
@@ -350,6 +431,13 @@ with open(out_cleaned, "w", encoding="utf-8") as f:
 
 n_tech = sum(1 for d in solr_docs if d["type_s"] == "assay_technique")
 n_ke_assay = sum(1 for d in solr_docs if d["type_s"] == "ke_assay")
+# ke_assay ids are a function of the record (KE, normalised name, endpoint); records that agree
+# on all three share an id and would overwrite each other in Solr — reported, not hidden
+ke_assay_id_counts = Counter(d["id"] for d in solr_docs if d["type_s"] == "ke_assay")
+n_ke_assay_id_collisions = sum(n - 1 for n in ke_assay_id_counts.values() if n > 1)
+if n_ke_assay_id_collisions:
+    logger.warning(f"{n_ke_assay_id_collisions} ke_assay records share an id with another "
+                   f"record (same KE, normalised name and endpoint)")
 logger.info(
     f"wrote {out_json}: {n_tech} assay_technique + {n_ke_assay} ke_assay docs "
     f"over {len(assays_ke_cleaned)} KEs"
@@ -391,6 +479,9 @@ stats = {
     "assay_min_support": int(assay_min_support),
     "iri_min_freq": int(iri_min_freq),
     "n_records_indexed": n_ke_assay,
+    "n_ke_assay_id_collisions": n_ke_assay_id_collisions,
+    # absorbed technique id -> surviving id, for consumers / Solr cleanup
+    "retired_technique_ids": retired_technique_ids,
     "n_techniques": n_tech,
     "n_ke_covered": len(assays_ke_cleaned),
     "records_per_technique_mean": (n_ke_assay / n_tech) if n_tech else None,
