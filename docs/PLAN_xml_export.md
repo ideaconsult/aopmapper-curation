@@ -1,6 +1,6 @@
 ﻿# Plan: XML export (+ XSLT view) of curated assays and full-corpus KEC
 
-Repo for all edits: `d:\nina\src\LLM\aopmapper-curation` (not the stale aop4enm cwd). Use `uv`. Schemas are frozen: no semantic edit to `aop.xsd` or `methods2aop_schema_proposal.xsd`.
+Repo for all edits: `aopmapper-curation` (not the stale aop4enm cwd). Use `uv`. Schemas are frozen: no semantic edit to `aop.xsd` or `methods2aop_schema_proposal.xsd`.
 Phased: **Phase A assays, Phase B KEC**, each independently shippable. Reviewed adversarially once (FAIL, findings folded in below; report: `plans/plan-to-add-a-playful-pizza-agent-a6913bfd21c8b01b9.md`).
 
 ## Context
