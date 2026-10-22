@@ -48,10 +48,16 @@ track_consistency_json = None
 # because 3/11 is below the gradient's amber cutoff. Binary accept/drop against the
 # real gate, mirroring tasks/viz_consensus.py's equivalent fix for the KEC track.
 assay_min_support = 1
+# Slim the JSON sidecar (opt-in; env key viz_slim_data): keep every assay field the report
+# shows or a downstream task reads, but reduce each record's `logprobs` block (~60% of
+# the bytes) to the endpoint-direction margin the report prints (tasks/viz_assay_slim.py).
+# False (default) writes the full records. The HTML is identical either way.
+slim_data = False
 # -
 
 from tasks.aop_select import load_wiki_id_map
 from tasks.logutil import setup_logging
+from tasks.viz_assay_slim import slim_cluster
 
 
 def _load_track_consistency(path) -> dict:
@@ -265,18 +271,18 @@ if enabled:
         # data sidecar: same per-KE grouping the HTML renders from, keyed by the
         # resolved KEnnn wiki-id so downstream consumers don't
         # need to redo the uuid->wiki-id translation.
-        data_kes.append({
-            "ke_id": ke_label,
-            "clusters": [
-                {
-                    "support": c.get("support", 0),
-                    "models": c.get("models") or [],
-                    "assay": c.get("assay") or {},
-                    "members": c.get("members") or [],
-                }
-                for c in ordered
-            ],
-        })
+        data_clusters = [
+            {
+                "support": c.get("support", 0),
+                "models": c.get("models") or [],
+                "assay": c.get("assay") or {},
+                "members": c.get("members") or [],
+            }
+            for c in ordered
+        ]
+        if slim_data:
+            data_clusters = [slim_cluster(c) for c in data_clusters]
+        data_kes.append({"ke_id": ke_label, "clusters": data_clusters})
 
     html_out = f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <title>Assay consensus — {_e(products)}</title><style>{_CSS}</style></head>
@@ -303,7 +309,9 @@ if enabled:
     if "data" in product:
         OUT_DATA = Path(product["data"])
         OUT_DATA.parent.mkdir(parents=True, exist_ok=True)
-        OUT_DATA.write_text(json.dumps(data_out, ensure_ascii=False), encoding="utf-8")
+        OUT_DATA.write_text(
+            json.dumps(data_out, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8")
         logger.info(f"wrote {OUT_HTML} + {OUT_DATA} ({len(consensus)} KEs)")
     else:
         logger.info(f"wrote {OUT_HTML} ({len(consensus)} KEs) — no 'data' product configured")
