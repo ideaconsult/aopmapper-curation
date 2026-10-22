@@ -4,8 +4,9 @@
   methods2aop_schema_proposal.xsd). XSLT 1.0 so that both browsers and lxml can run it.
   Two views: assays grouped by Key Event (each row shows its technique), and techniques
   (each with the assays and Key Events that use it). GUIDs are resolved to the readable
-  ids through the document's <lookup> section; ontology terms link to a search on the EBI
-  Ontology Lookup Service.
+  ids through the document's <lookup> section; ontology terms (and the object / process /
+  action of an assay's optional <kec-triple>) link to a search on the EBI Ontology Lookup
+  Service.
 -->
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -62,7 +63,7 @@
           <table>
             <tr>
               <th>Assay</th><th>Technique</th><th>Type</th><th>System</th><th>Endpoint</th>
-              <th>Ontology terms</th><th>Guideline</th><th>Throughput</th>
+              <th>Ontology terms</th><th>KEC triple</th><th>Guideline</th><th>Throughput</th>
               <th>Support</th><th>Evidence</th>
             </tr>
             <xsl:apply-templates select="key('by-ke', @ke-id)"/>
@@ -143,20 +144,14 @@
       </td>
       <td>
         <xsl:for-each select="$mm/m:ontology-terms/m:ontology-term">
+          <div><xsl:call-template name="term"/></div>
+        </xsl:for-each>
+      </td>
+      <td>
+        <xsl:for-each select="m:kec-triple/m:object | m:kec-triple/m:process | m:kec-triple/m:action">
           <div>
-            <xsl:choose>
-              <xsl:when test="m:iri">
-                <a target="_blank">
-                  <xsl:attribute name="href">
-                    <xsl:text>https://www.ebi.ac.uk/ols4/search?q=</xsl:text>
-                    <xsl:call-template name="local-id"><xsl:with-param name="iri" select="m:iri"/></xsl:call-template>
-                  </xsl:attribute>
-                  <xsl:value-of select="m:label"/>
-                </a>
-              </xsl:when>
-              <xsl:otherwise><xsl:value-of select="m:label"/></xsl:otherwise>
-            </xsl:choose>
-            <xsl:if test="m:ontology"> <span class="meta">[<xsl:value-of select="m:ontology"/>]</span></xsl:if>
+            <span class="meta"><xsl:value-of select="local-name()"/>: </span>
+            <xsl:call-template name="term"/>
           </div>
         </xsl:for-each>
       </td>
@@ -169,6 +164,24 @@
         </xsl:for-each>
       </td>
     </tr>
+  </xsl:template>
+
+  <!-- an ontology-term-type element (ontology-term, or a kec-triple object / process /
+       action): label linked to an OLS search when it has an IRI, then the ontology prefix -->
+  <xsl:template name="term">
+    <xsl:choose>
+      <xsl:when test="m:iri">
+        <a target="_blank">
+          <xsl:attribute name="href">
+            <xsl:text>https://www.ebi.ac.uk/ols4/search?q=</xsl:text>
+            <xsl:call-template name="local-id"><xsl:with-param name="iri" select="m:iri"/></xsl:call-template>
+          </xsl:attribute>
+          <xsl:value-of select="m:label"/>
+        </a>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="m:label"/></xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test="m:ontology"> <span class="meta">[<xsl:value-of select="m:ontology"/>]</span></xsl:if>
   </xsl:template>
 
   <!-- Key Event GUID -> "KE123" through the lookup (the GUID itself if not listed) -->

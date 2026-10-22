@@ -24,7 +24,10 @@ The mapping of a record onto <method> is hand-written because AssayRecord
     species                 -> species/taxon
     evidence                -> evidence/source-text
     ontology_terms{name,id} -> ontology-terms/ontology-term{label,iri,ontology}
-`kec_triple` and other Solr-only fields have no element and are not exported.
+and onto the <assay> wrapper (a sibling of <method>, not part of it):
+    kec_triple{biological_object, biological_process, biological_action}{name,iri,source}
+        -> kec-triple/object, process, action (ontology-term-type; omitted when empty)
+Other Solr-only fields have no element and are not exported.
 
 Everything lossy is counted in an XmlReport (coerced enums, dropped ontology terms,
 unknown prefixes, skipped records, ...) rather than silently swallowed.
@@ -54,6 +57,7 @@ from aopkb.methods2aop import (
     OntologyTermType,
     ThroughputEnum,
 )
+from tasks.kec_compare import iri_to_solr_id
 
 M2A_NS = "http://www.aopkb.org/aop-xml"
 
@@ -84,6 +88,8 @@ SPECIAL_BASES = {
 }
 _SHORT_ID = re.compile(r"^([A-Za-z][A-Za-z0-9]*)_([A-Za-z0-9][A-Za-z0-9._-]*)$")
 _KE_ID = re.compile(r"^KE(\d+)$")
+# models sometimes put a CURIE ("GO:0006954") in the iri slot of a triple
+_CURIE = re.compile(r"^[A-Za-z][A-Za-z0-9]*:[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 # characters that are illegal in XML 1.0 (LLM output occasionally contains them)
 _XML_ILLEGAL = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff￾￿]")
@@ -108,11 +114,16 @@ class XmlReport:
     n_kes: int = 0
     n_techniques: int = 0
     n_ontology_terms: int = 0
+    n_kec_triples: int = 0                 # assays exported with a <kec-triple>
+    n_triple_terms: int = 0                # object / process / action elements written
     coerced_enums: Counter = field(default_factory=Counter)        # field -> n
     coerced_values: Counter = field(default_factory=Counter)       # "field=value" -> n
     mapped_inflections: Counter = field(default_factory=Counter)   # "field=value" -> n
     dropped_terms: int = 0
     unknown_prefixes: Counter = field(default_factory=Counter)     # prefix -> n
+    # kec-triple slots whose IRI could not be expanded: the slot is kept label-only
+    triple_iris_dropped: int = 0
+    triple_unknown_prefixes: Counter = field(default_factory=Counter)  # prefix -> n
     # records not exported at all (their terms/enums are not counted above)
     records_without_name: int = 0
     records_without_ke_number: int = 0     # ke_id is not "KE<n>"
@@ -134,11 +145,15 @@ class XmlReport:
             "n_kes": self.n_kes,
             "n_techniques": self.n_techniques,
             "n_ontology_terms": self.n_ontology_terms,
+            "n_kec_triples": self.n_kec_triples,
+            "n_triple_terms": self.n_triple_terms,
             "coerced_enums": dict(self.coerced_enums),
             "coerced_values": dict(self.coerced_values.most_common(50)),
             "mapped_inflections": dict(self.mapped_inflections),
             "dropped_terms": self.dropped_terms,
             "unknown_prefixes": dict(self.unknown_prefixes),
+            "triple_iris_dropped": self.triple_iris_dropped,
+            "triple_unknown_prefixes": dict(self.triple_unknown_prefixes.most_common(50)),
             "records_without_name": self.records_without_name,
             "records_without_ke_number": self.records_without_ke_number,
             "records_without_ke_uuid": self.records_without_ke_uuid,
@@ -262,6 +277,49 @@ def _ontology_terms(rec: dict, report: XmlReport) -> list[OntologyTermType]:
     return out
 
 
+def _triple_term(slot, report: XmlReport) -> Optional[OntologyTermType]:
+    """One kec_triple slot ({name, iri, source}, IRI as the extraction model wrote it,
+    usually a full IRI) -> OntologyTermType, or None when the slot is empty.
+
+    The IRI goes through the same short-form id + prefix map as the other ontology terms.
+    Unlike those, a slot with a label survives an IRI that cannot be expanded (unknown
+    prefix, malformed) as a label-only term and the loss is counted; the action slot is
+    controlled vocabulary without IRI and is label-only by design."""
+    if isinstance(slot, str):
+        slot = {"name": slot}
+    if not isinstance(slot, dict):
+        return None
+    label = _clean(slot.get("name"), report)
+    sid = iri_to_solr_id(slot.get("iri"))
+    if sid and _CURIE.match(sid):                   # "GO:0006954" written as a CURIE
+        sid = sid.replace(":", "_", 1)
+    expanded = expand_iri(sid)
+    if sid and expanded is None:
+        report.triple_iris_dropped += 1
+        report.triple_unknown_prefixes[sid.split("_")[0].upper()] += 1
+    if expanded is None:
+        return OntologyTermType(label=label) if label else None
+    iri, prefix = expanded
+    return OntologyTermType(label=label or sid, iri=iri, ontology=prefix)
+
+
+def record_to_kec_triple(rec: dict,
+                         report: XmlReport) -> Optional[Assays.Assay.KecTriple]:
+    """The record's kec_triple -> <kec-triple>, or None when absent or all three slots
+    are empty (the XSD does not allow an empty element)."""
+    triple = rec.get("kec_triple")
+    if not isinstance(triple, dict):
+        return None
+    slots = {s: _triple_term(triple.get(f"biological_{s}", triple.get(s)), report)
+             for s in ("object", "process", "action")}
+    if not any(slots.values()):
+        return None
+    report.n_kec_triples += 1
+    report.n_triple_terms += sum(1 for v in slots.values() if v)
+    return Assays.Assay.KecTriple(object_value=slots["object"],
+                                  process=slots["process"], action=slots["action"])
+
+
 def record_to_method(rec: dict, report: XmlReport) -> Optional[MeasurementMethodType]:
     """One flat record -> MeasurementMethodType; None if the record has no assay name
     (nothing is counted in that case). Empty wrappers (cell-types, ontology-terms, ...)
@@ -368,7 +426,7 @@ def build_assays(records: list[dict], report: Optional[XmlReport] = None,
         models = sorted({re.sub(r"\s+", "_", _clean(m, report))
                          for m in rec.get("models") or [] if _clean(m, report)})
         assays.append(Assays.Assay(
-            method=method, id=gid, ke_id=ke_uuid, technique_id=tech_guid,
+            method=method, kec_triple=record_to_kec_triple(rec, report), id=gid, ke_id=ke_uuid, technique_id=tech_guid,
             support=int(rec["support"]) if rec.get("support") is not None else None,
             models=models,
         ))

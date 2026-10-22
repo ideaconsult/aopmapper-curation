@@ -60,6 +60,10 @@
   sequential number ASSAY<n> (like KE1234 in the AOP-Wiki), assigned once per assay and
   never reused; it identifies the assay itself, not its technique. So assay-reference is
   1:1 with <assay>.
+  An <assay> may also carry an optional <kec-triple> after its <method>: the
+  (object, process, action) triple extracted for that assay, each slot an
+  ontology-term-type. It is a sibling of <method>, so measurement-method-type and its
+  enumerations are unchanged.
   Assay techniques are separate top-level objects of the container (<techniques>), like
   the biological-process dictionary entries of aop.xsd: an <assay> references its
   technique by GUID (@technique-id) instead of just repeating the technique name.
@@ -266,6 +270,22 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="method" type="measurement-method-type"/>
+              <!-- Optional: the biological change this assay measures, as the
+                   (object, process, action) triple the extraction model returned for it.
+                   Each slot is an ontology-term-type (label, optional iri / ontology);
+                   an ungrounded slot, e.g. the controlled-vocabulary action, carries the
+                   label only. An empty element is not valid: leave it out instead. It
+                   sits on the assay wrapper, not in measurement-method-type. -->
+              <xs:element name="kec-triple" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="object"  type="ontology-term-type" minOccurs="0"/>
+                    <xs:element name="process" type="ontology-term-type" minOccurs="0"/>
+                    <xs:element name="action"  type="ontology-term-type" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:assert test="count(*) ge 1"/>
+                </xs:complexType>
+              </xs:element>
             </xs:sequence>
             <xs:attribute name="id"           type="guid" use="required"/>
             <xs:attribute name="ke-id"        type="guid" use="required"/>
@@ -516,6 +536,21 @@
         <measured-endpoint>cell count</measured-endpoint>
         <endpoint-direction>decrease</endpoint-direction>
       </method>
+      <kec-triple>
+        <object>
+          <label>cell</label>
+          <iri>http://purl.obolibrary.org/obo/CL_0000000</iri>
+          <ontology>CL</ontology>
+        </object>
+        <process>
+          <label>cell population proliferation</label>
+          <iri>http://purl.obolibrary.org/obo/GO_0008283</iri>
+          <ontology>GO</ontology>
+        </process>
+        <action>
+          <label>decreased</label>
+        </action>
+      </kec-triple>
     </assay>
 
     <lookup>

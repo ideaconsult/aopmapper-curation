@@ -282,6 +282,13 @@ class Assays(BaseModel):
                 "type": "Element",
             }
         )
+        kec_triple: None | Assays.Assay.KecTriple = field(
+            default=None,
+            metadata={
+                "name": "kec-triple",
+                "type": "Element",
+            },
+        )
         id: str = field(
             metadata={
                 "type": "Attribute",
@@ -316,6 +323,28 @@ class Assays(BaseModel):
                 "tokens": True,
             },
         )
+
+        class KecTriple(BaseModel):
+            model_config = ConfigDict(defer_build=True)
+            object_value: None | OntologyTermType = field(
+                default=None,
+                metadata={
+                    "name": "object",
+                    "type": "Element",
+                },
+            )
+            process: None | OntologyTermType = field(
+                default=None,
+                metadata={
+                    "type": "Element",
+                },
+            )
+            action: None | OntologyTermType = field(
+                default=None,
+                metadata={
+                    "type": "Element",
+                },
+            )
 
     class Lookup(BaseModel):
         model_config = ConfigDict(defer_build=True)

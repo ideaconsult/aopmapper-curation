@@ -47,7 +47,7 @@ def rec(**kw):
         "guideline": "OECD TG 487", "throughput": "high",
         "evidence": ["DAPI staining is used to count nuclei"],
         "support": 7, "models": ["google--gemma-3-27b-it", "Qwen--Qwen3.6-27B"],
-        "kec_triple": {"biological_object": {"name": "cell"}},       # not exported
+        "kec_triple": None,                     # exported only when given (see below)
     }
     base.update(kw)
     return base
@@ -97,7 +97,7 @@ def test_round_trip_classes_to_xml_and_back(tmp_path):
 
 
 def test_single_namespace_and_unexported_fields(tmp_path):
-    path, _ = write(tmp_path, [rec()])
+    path, _ = write(tmp_path, [rec(kec_triple=None)])
     text = path.read_text(encoding="utf-8")
     root = root_of(path)
     assert root.tag == f"{{{ax.M2A_NS}}}assays"
@@ -518,3 +518,154 @@ def test_html_view_has_ke_and_technique_views_and_links_to_ols(tmp_path):
     assert re.search(r"3 assays in\s+2\s+Key Events", text)
     # the assay row shows its technique and the stable assay id
     assert "ASSAY101" in text
+
+
+# ── optional <kec-triple> on the assay wrapper ────────────────────────────────
+
+TRIPLE = {
+    "biological_object": {"name": "cell", "iri": "http://purl.obolibrary.org/obo/CL_0000000",
+                          "source": "CL"},
+    "biological_process": {"name": "cell population proliferation",
+                           "iri": "http://purl.obolibrary.org/obo/GO_0008283",
+                           "source": "GO"},
+    "biological_action": {"name": "decreased", "iri": None, "source": None},
+}
+
+
+def kec_el(path):
+    return root_of(path).find("m:assay/m:kec-triple", NS)
+
+
+def test_kec_triple_is_a_sibling_of_method_and_frozen_type_is_unchanged():
+    xs = "{http://www.w3.org/2001/XMLSchema}"
+    root = etree.parse(str(XSD)).getroot()
+    mmt = next(el for el in root.iter(f"{xs}complexType")
+               if el.get("name") == "measurement-method-type")
+    assert "kec-triple" not in {e.get("name") for e in mmt.iter(f"{xs}element")}
+    assay = next(el for el in root.iter(f"{xs}element") if el.get("name") == "assay")
+    order = [e.get("name") for e in assay.find(f"{xs}complexType/{xs}sequence")
+             if e.tag == f"{xs}element"]
+    assert order == ["method", "kec-triple"]
+    assert assay.find(f"{xs}complexType/{xs}sequence/{xs}element[@name='kec-triple']"
+                      ).get("minOccurs") == "0"
+
+
+def test_kec_triple_round_trip_and_validation(tmp_path):
+    assays, report = build([rec(kec_triple=TRIPLE)])
+    path = ax.write_xml(assays, tmp_path / "a.xml")
+    parsed = XmlParser().from_path(path, Assays)
+    assert parsed.model_dump() == assays.model_dump()
+    t = parsed.assay[0].kec_triple
+    assert t.object_value.label == "cell" and t.object_value.ontology == "CL"
+    assert t.process.iri == "http://purl.obolibrary.org/obo/GO_0008283"
+    assert t.action.label == "decreased" and t.action.iri is None
+    assert t.action.ontology is None
+    # in the document the element follows <method>
+    assay = root_of(path).find("m:assay", NS)
+    assert [etree.QName(c).localname for c in assay] == ["method", "kec-triple"]
+    assert [etree.QName(c).localname for c in kec_el(path)] == [
+        "object", "process", "action"]
+    assert ax.validate(path, XSD, report) == []
+    assert report.n_kec_triples == 1 and report.n_triple_terms == 3
+    assert report.triple_iris_dropped == 0
+
+
+def test_kec_triple_is_omitted_when_absent_or_empty(tmp_path):
+    empties = [None, {}, {"biological_object": None},
+               {"biological_object": {"name": "", "iri": None},
+                "biological_action": {"name": "  "}}]
+    for i, empty in enumerate(empties):
+        path, report = write(tmp_path, [rec(kec_triple=empty)], name=f"e{i}.xml")
+        assert kec_el(path) is None
+        assert "kec-triple" not in path.read_text(encoding="utf-8")
+        assert report.n_kec_triples == 0 and report.n_triple_terms == 0
+        assert ax.validate(path, XSD) == []
+
+
+def test_empty_kec_triple_element_fails_validation(tmp_path):
+    path, _ = write(tmp_path, [rec(kec_triple=TRIPLE)])
+    text = path.read_text(encoding="utf-8")
+    emptied = re.sub(r"<kec-triple>.*?</kec-triple>", "<kec-triple/>", text, flags=re.S)
+    assert emptied != text
+    bad = tmp_path / "empty.xml"
+    bad.write_text(emptied, encoding="utf-8")
+    assert ax.validate(bad, XSD)                       # xs:assert count(*) ge 1
+
+
+def test_kec_triple_slots_use_the_term_prefix_expansion(tmp_path):
+    triple = {
+        "biological_object": {"name": "acetylcholine",
+                              "iri": "http://purl.obolibrary.org/obo/CHEBI_15718"},
+        "biological_process": {"name": "bao thing",
+                               "iri": "http://www.bioassayontology.org/bao#BAO_0000179"},
+        "biological_action": "increased",              # bare string, label only
+    }
+    path, report = write(tmp_path, [rec(kec_triple=triple)])
+    kt = kec_el(path)
+    obj = kt.find("m:object", NS)
+    assert obj.find("m:iri", NS).text == "http://purl.obolibrary.org/obo/CHEBI_15718"
+    assert obj.find("m:ontology", NS).text == "CHEBI"
+    proc = kt.find("m:process", NS)
+    assert proc.find("m:iri", NS).text == "http://www.bioassayontology.org/bao#BAO_0000179"
+    assert proc.find("m:ontology", NS).text == "BAO"
+    act = kt.find("m:action", NS)
+    assert act.find("m:label", NS).text == "increased"
+    assert act.find("m:iri", NS) is None and act.find("m:ontology", NS) is None
+    assert ax.validate(path, XSD) == []
+
+
+def test_kec_triple_unknown_prefix_keeps_the_label_and_is_counted(tmp_path):
+    triple = {"biological_object": {"name": "weird thing",
+                                    "iri": "http://example.org/onto/ZZZ_0001"},
+              "biological_process": {"name": "ok", "iri": "GO_0008283"},
+              "biological_action": None}
+    path, report = write(tmp_path, [rec(kec_triple=triple)])
+    kt = kec_el(path)
+    obj = kt.find("m:object", NS)
+    assert obj.find("m:label", NS).text == "weird thing"
+    assert obj.find("m:iri", NS) is None and obj.find("m:ontology", NS) is None
+    assert kt.find("m:process/m:iri", NS).text == (
+        "http://purl.obolibrary.org/obo/GO_0008283")          # short ids are accepted
+    assert kt.find("m:action", NS) is None
+    assert report.triple_iris_dropped == 1
+    assert dict(report.triple_unknown_prefixes) == {"ZZZ": 1}
+    assert report.dropped_terms == 0 and not report.unknown_prefixes
+    d = report.to_dict()
+    assert d["n_kec_triples"] == 1 and d["triple_iris_dropped"] == 1
+    assert ax.validate(path, XSD) == []
+
+
+def test_kec_triple_does_not_change_the_other_content(tmp_path):
+    with_t, _ = write(tmp_path, [rec(kec_triple=TRIPLE)], name="with.xml")
+    without, _ = write(tmp_path, [rec(kec_triple=None)], name="without.xml")
+    stripped = re.sub(r"\s*<kec-triple>.*?</kec-triple>", "",
+                      with_t.read_text(encoding="utf-8"), flags=re.S)
+    assert stripped == without.read_text(encoding="utf-8")
+
+
+def test_html_view_shows_the_kec_triple_with_ols_links(tmp_path):
+    path, _ = write(tmp_path, [rec(kec_triple=TRIPLE)])
+    text = ax.render_html(path, ASSAYS_XSL, tmp_path / "o" / "a.html").read_text(
+        encoding="utf-8")
+    assert "KEC triple" in text
+    assert "https://www.ebi.ac.uk/ols4/search?q=CL_0000000" in text
+    assert "object:" in text and "process:" in text and "action:" in text
+    assert "decreased" in text
+    # no triple, no triple lines (the column header remains)
+    path2, _ = write(tmp_path, [rec(kec_triple=None)], name="n.xml")
+    text2 = ax.render_html(path2, ASSAYS_XSL, tmp_path / "o" / "n.html").read_text(
+        encoding="utf-8")
+    assert "object:" not in text2 and "process:" not in text2
+
+
+def test_kec_triple_curie_iri_is_accepted(tmp_path):
+    triple = {"biological_process": {"name": "inflammatory response",
+                                     "iri": "GO:0006954", "source": "GO"},
+              "biological_object": {"name": "x", "iri": "P01863"}}   # bare accession
+    path, report = write(tmp_path, [rec(kec_triple=triple)])
+    kt = kec_el(path)
+    assert kt.find("m:process/m:iri", NS).text == (
+        "http://purl.obolibrary.org/obo/GO_0006954")
+    assert kt.find("m:object/m:iri", NS) is None            # unmappable: label only
+    assert report.triple_iris_dropped == 1
+    assert ax.validate(path, XSD) == []
