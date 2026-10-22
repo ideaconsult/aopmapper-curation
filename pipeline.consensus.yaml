@@ -34,6 +34,42 @@ tasks:
       # Publish accept/drop color threshold (env.consensus.yaml's min_support_ensemble).
       min_support_ensemble: "{{min_support_ensemble}}"
 
+  # xsdata-pydantic bindings for the KEC consensus XML (aopkb/kec_consensus.py, from
+  # resources/kec_consensus_schema.xsd). Not part of the data flow.
+  - source: tasks/gen_kec_bindings.py
+    product:
+      nb: "{{products}}/gen_kec_bindings.ipynb"
+      kec_consensus: "aopkb/kec_consensus.py"
+    params:
+      kec_xsd: "resources/kec_consensus_schema.xsd"
+
+  # The cross-model consensus triples as XML valid against resources/kec_consensus_schema.xsd
+  # (<kec-consensus> container: terms, per-KE curated triples with derived status, one object
+  # per cluster with per-model members), a report, and a static HTML view via
+  # resources/xslt/kec_consensus.xsl. A separate document type that references Key Events by
+  # AOP-Wiki GUID; AOP-Wiki XML and aop.xsd are not touched.
+  # Full corpus (KEC_ALL): extraction, not selection, so run with the whole panel:
+  #   --env--products <.../KEC_ALL> --env--viz_restrict_to_ensemble false
+  # (the export warns in xml_report.json when the viz_consensus it reads was restricted).
+  - source: tasks/export_kec_xml.py
+    upstream: ["crossmodel_compare", "viz_consensus"]
+    product:
+      nb: "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/export_kec_xml.ipynb"
+      xml: "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/xml/kec_consensus.xml"
+      html: "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/xml/kec_consensus.html"
+      report: "{{products}}/crossmodel/{{crossmodel}}/{{ranking}}/{{ensemble_mode}}/xml/xml_report.json"
+    params:
+      # KEnnn -> AOP-Wiki GUID is read from the per-model kec.json (ke_id, uuid) of the panel,
+      # the same products/models as viz_consensus
+      products: "{{products}}"
+      model_keys: "{{model_keys}}"
+      # fail when more than this share of the Key Events has no GUID
+      max_unresolved_fraction: 0.05
+      # a cluster is exported (and can confirm a curated triple) when support >= this
+      min_support_ensemble: "{{min_support_ensemble}}"
+      kec_xsd: "resources/kec_consensus_schema.xsd"
+      kec_xslt: "resources/xslt/kec_consensus.xsl"
+
   - source: tasks/figures_crossmodel.py
     upstream: ["crossmodel_compare"]
     product:
