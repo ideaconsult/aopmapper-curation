@@ -21,7 +21,6 @@ Ploomber:
 """
 from __future__ import annotations
 
-import html as _html
 import json
 from pathlib import Path
 
@@ -53,10 +52,16 @@ assay_min_support = 1
 # the bytes) to the endpoint-direction margin the report prints (tasks/viz_assay_slim.py).
 # False (default) writes the full records. The HTML is identical either way.
 slim_data = False
+# KEC-track product root holding {model_key}/kec.json — the source of KE titles shown in
+# each KE summary (env.assays_consensus.yaml track_consistency.kec_products). None/missing
+# files just leave the titles out.
+kec_products = None
 # -
 
 from tasks.aop_select import load_wiki_id_map
 from tasks.logutil import setup_logging
+from tasks.viz_assay_render import (_e, _cluster_block, ke_block,
+                                      load_ke_titles, page_shell)
 from tasks.viz_assay_slim import slim_cluster
 
 
@@ -78,131 +83,6 @@ def _load_track_consistency(path) -> dict:
 
 
 logger = setup_logging(Path(product["html"]).parent / "viz_assay_consensus.log")
-
-_CSS = """
-* { box-sizing: border-box; font-family: system-ui, sans-serif; font-size: 13px; }
-body { margin: 16px; color: #222; }
-h1 { font-size: 18px; margin-bottom: 4px; }
-.info { font-size: 12px; color: #555; margin-bottom: 8px; }
-.hist { margin-bottom: 16px; }
-details { margin-bottom: 6px; border: 1px solid #ddd; border-radius: 4px; }
-details > summary { cursor: pointer; padding: 6px 10px; background: #f5f5f5;
-    font-weight: 600; list-style: none; display: flex; gap: 8px; align-items: center; }
-details > summary::-webkit-details-marker { display: none; }
-table { width: 100%; border-collapse: collapse; }
-th { background: #eceff1; font-size: 11px; padding: 3px 6px; text-align: left;
-     border-bottom: 2px solid #cfd8dc; }
-td { padding: 3px 6px; vertical-align: top; border-bottom: 1px solid #f0f0f0; }
-.rep { background: #e8f5e9; }
-.ev { color: #555; font-style: italic; font-size: 11px; }
-.iri { font-size: 10px; color: #666; }
-.sep { color: #bbb; padding: 0 2px; }
-"""
-
-
-def _e(s) -> str:
-    return _html.escape(str(s)) if s else ""
-
-
-def _lab(k: str) -> str:
-    return k.split("--", 1)[-1] if "--" in k else k
-
-
-def _support_bar(support: int, n: int, min_sup: int) -> str:
-    """Binary accept/drop against `min_sup` (the Solr publish gate), not a fraction-of-
-    panel gradient — a bar is green iff this cluster will actually be indexed."""
-    accepted = support >= min_sup
-    color = "#2e7d32" if accepted else "#e65100"
-    pct = int(100 * support / max(n, 1))
-    tag = "" if accepted else " ✗ below min_support"
-    return (f'<span style="color:{color};font-weight:700" '
-            f'title="assay_min_support={min_sup}">{support}/{n}{tag}</span> '
-            f'<span style="display:inline-block;width:60px;height:8px;background:#eee;'
-            f'border-radius:3px;vertical-align:middle"><span style="display:block;'
-            f'width:{pct}%;height:100%;background:{color};border-radius:3px"></span></span>')
-
-
-def _fmt_kec_triple(t: dict | None) -> str:
-    """'object / process / action' names for an assay's own kec_triple slot
-    (AssayRecord.kec_triple, biological_object/process/action keys). Local
-    re-implementation of crossmodel_track_consistency._fmt_triple's formatting
-    (not imported — that module pulls in the embedder and match machinery this
-    viz has no other use for) so the two reports render a triple identically."""
-    if not t:
-        return ""
-    names = [(t.get(k) or {}).get("name")
-             for k in ("biological_object", "biological_process", "biological_action")]
-    if not any(names):
-        return ""
-    return " / ".join(n or "—" for n in names)
-
-
-def _assay_cells(a: dict, cross_track: dict | None = None) -> str:
-    name = _e(a.get("assay_name"))
-    mt = _e(a.get("method_type"))
-    ep = _e(a.get("measured_endpoint"))
-    di = _e(a.get("endpoint_direction"))
-    tp = _e(a.get("throughput"))
-    # direction margin if present
-    m = ((a.get("logprobs") or {}).get("endpoint_direction") or {}).get("margin")
-    margin = f' <span style="color:#888">m={m:.2f}</span>' if isinstance(m, (int, float)) else ""
-    iris = [t.get("iri") for t in (a.get("ontology_terms") or []) if t.get("iri")]
-    iri_html = (f'<div class="iri">{_e(", ".join(i.rsplit("/", 1)[-1] for i in iris))}</div>'
-                if iris else "")
-    ev = a.get("evidence") or []
-    ev_html = (f'<div class="ev">“{_e(" … ".join(ev)[:240])}”</div>' if ev else "")
-
-    # This model's own read of the biology this assay measures (kec_triple), and
-    # whether it agrees with this model's own KEC-track triple for the same Key
-    # Event (D5, response_plan.md R1 §5.3) — a coherence check needing no curated
-    # reference and no second model. Omitted entirely when the run has no matching
-    # track-consistency data, so the report is unchanged for runs without it.
-    kec_html = ""
-    kec_str = _fmt_kec_triple(a.get("kec_triple"))
-    if kec_str:
-        if cross_track is not None:
-            matched = cross_track.get("matched")
-            color = "#2e7d32" if matched else "#b71c1c"
-            tag = ("agrees" if matched else "disagrees") if matched is not None else "unscored"
-            kec_html = (f'<div class="kec" style="color:{color}">{_e(kec_str)} '
-                        f'<span style="color:#888;font-weight:400">({tag} w/ KE)</span></div>')
-        else:
-            kec_html = f'<div class="kec" style="color:#555">{_e(kec_str)}</div>'
-
-    return (f'<td>{name}{iri_html}{kec_html}</td><td>{mt}</td>'
-            f'<td>{ep}</td><td>{di}{margin}</td><td>{tp}{ev_html}</td>')
-
-
-def _cluster_block(cluster: dict, n_models: int, min_sup: int, ke_id: str,
-                   track_consistency: dict) -> str:
-    support = cluster.get("support", 0)
-    rep = cluster.get("assay") or {}
-    members = cluster.get("members") or []
-    model_list = ", ".join(_lab(m) for m in (cluster.get("models") or []))
-
-    member_rows = "".join(
-        f'<tr><td style="font-size:11px;color:#555">{_e(_lab(m.get("model")))}</td>'
-        f'{_assay_cells(m.get("assay") or {}, track_consistency.get((m.get("model"), ke_id, (m.get("assay") or {}).get("assay_name"))))}</tr>'
-        for m in members)
-
-    return f"""
-<details>
-<summary>{_support_bar(support, n_models, min_sup)}
-  <span style="font-weight:600">{_e(rep.get("assay_name"))}</span>
-  <span class="sep">|</span>
-  <span style="color:#444;font-weight:400">{_e(rep.get("measured_endpoint"))}
-    ({_e(rep.get("method_type"))})</span>
-  <span class="sep">|</span>
-  <span style="font-size:11px;color:#888">{_e(model_list)}</span>
-</summary>
-<table>
-<thead><tr><th>model</th><th>assay</th><th>method</th><th>endpoint</th>
-  <th>direction</th><th>throughput / evidence</th></tr></thead>
-<tbody>
-<tr class="rep"><td><b>repr.</b></td>{_assay_cells(rep)}</tr>
-{member_rows}
-</tbody></table>
-</details>"""
 
 
 if enabled:
@@ -249,6 +129,14 @@ if enabled:
     def _ke_sort(item):
         return -max((c.get("support", 0) for c in item[1]), default=0)
 
+    # KE titles (plain text in each KE summary) from the KEC-track kec.json files;
+    # KEs with no title in any model render without one and are counted/logged.
+    ke_titles, no_title = load_ke_titles(
+        kec_products, model_keys,
+        [wiki_map.get(k, k) for k, v in consensus.items() if v])
+    logger.info(f"KE titles: {len(ke_titles)} found, {len(no_title)} missing"
+                + (f" ({', '.join(no_title)})" if no_title else ""))
+
     blocks = []
     data_kes = []
     for ke_id, clusters in sorted(consensus.items(), key=_ke_sort):
@@ -259,15 +147,7 @@ if enabled:
         ke_label = wiki_map.get(ke_id, ke_id)
         inner = "".join(_cluster_block(c, n_models, gate, ke_label, track_consistency)
                         for c in ordered)
-        ke_url = f"https://aop.adma.ai/?fieldId={_e(ke_label)}"
-        blocks.append(f"""
-<details>
-<summary><a href="{ke_url}" target="_blank" rel="noopener"
-  style="font-family:monospace;color:inherit;text-decoration:none;border-bottom:1px dotted"
-  onclick="event.stopPropagation()">{_e(ke_label)}</a>
-  <span class="sep">|</span>
-  <span style="color:#888;font-size:12px">{len(clusters)} assays, {n_idx} indexed</span>
-</summary>{inner}</details>""")
+        blocks.append(ke_block(ke_label, len(clusters), n_idx, inner, ke_titles.get(ke_label)))
         # data sidecar: same per-KE grouping the HTML renders from, keyed by the
         # resolved KEnnn wiki-id so downstream consumers don't
         # need to redo the uuid->wiki-id translation.
@@ -284,13 +164,12 @@ if enabled:
             data_clusters = [slim_cluster(c) for c in data_clusters]
         data_kes.append({"ke_id": ke_label, "clusters": data_clusters})
 
-    html_out = f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<title>Assay consensus — {_e(products)}</title><style>{_CSS}</style></head>
-<body><h1>Cross-model assay consensus — {_e(products)}</h1>
-<p class="info">{_e(info)}</p>
+    html_out = page_shell(
+        f"Assay consensus — {_e(products)}",
+        f"Cross-model assay consensus — {_e(products)}",
+        f"""<p class="info">{_e(info)}</p>
 <p class="hist">Support distribution: {hist_html}</p>
-{"".join(blocks)}
-</body></html>"""
+{"".join(blocks)}""")
     OUT_HTML.write_text(html_out, encoding="utf-8")
 
     data_out = {
