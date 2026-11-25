@@ -90,5 +90,5 @@ as a network service, you must make your modified source available to its users.
 
 ## Citation
 
-Citation details and DOI (Zenodo archive of the tagged release corresponding to the
-paper) will be added here on publication.
+Citation details will be added here on publication.
+
